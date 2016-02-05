@@ -3,8 +3,8 @@ module.exports = {
     entry: ['./src/index.js'],
 
     output: {
-        path: __dirname + '/public/static/js/',
-        publicPath: 'http://localhost:8080/public/static/js/',
+        path: __dirname + '/public/static/aPanel/js/',
+        publicPath: 'http://localhost:8080/public/static/aPanel/js/',
         filename: 'build.js'
     },
 

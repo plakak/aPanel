@@ -19,8 +19,8 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.set('view engine', 'jade');
 app.use(cookieParser());
 
-app.use('/css', express.static(__dirname + '/public/static/css'));
-app.use('/js', express.static(__dirname + '/public/static/js'));
+app.use('/aPanel', express.static(__dirname + '/public/static/aPanel'));
+app.use('/', express.static(__dirname + '/public/dist'));
 
 mongoose.connect(DB_URI, DB_CRED);
 

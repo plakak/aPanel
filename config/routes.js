@@ -16,20 +16,20 @@ module.exports = function(app, express) {
 
     app.use('/', router);
 
-    router.all('/tasks/*', checkAuth);
+    router.all('/aPanel/tasks/*', checkAuth);
 
-    router.get('/', function(req, res){
+    router.get('/aPanel', function(req, res){
         res.render('index.jade', {auth: req.user, error: req.flash('error')});
     });
 
-    router.get('/init', initCheck, function(req, res){
+    router.get('/aPanel/init', initCheck, function(req, res){
         res.render('init.jade', {authorized: true});
     });
 
-    router.post('/init', initCheck, function(req, res) {
+    router.post('/aPanel/init', initCheck, function(req, res) {
         addUser(req, function(err, success){
             if (!err && success) {
-                res.redirect('/');
+                res.redirect('/aPanel/');
             } else {
                 res.render('init.jade', {authorized: true, error: true});
             }
@@ -37,26 +37,26 @@ module.exports = function(app, express) {
 
     });
 
-    router.get('/expired', function(req, res){
+    router.get('/aPanel/expired', function(req, res){
         res.render('index.jade', {auth: req.user, expired: true});
     });
 
-    router.get('/logout', function(req, res){
+    router.get('/aPanel/logout', function(req, res){
         req.logout();
-        res.redirect('/');
+        res.redirect('/aPanel/');
     });
 
-    router.post('/login', passport.authenticate('local', {
-        failureRedirect: '/',
+    router.post('/aPanel/login', passport.authenticate('local', {
+        failureRedirect: '/aPanel/',
         failureFlash: true,
         badRequestMessage: 'Username and password are required to login.'
     }), function(req, res){
-        res.redirect('/');
+        res.redirect('/aPanel/');
     });
 
     // AUTH
 
-    router.get('/tasks/getPosts', function(req,res){
+    router.get('/aPanel/tasks/getPosts', function(req,res){
         res.end('authWorks')
     });
 };

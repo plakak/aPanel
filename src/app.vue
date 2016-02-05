@@ -61,7 +61,7 @@
         watch: {
             'loggedIn'(){
                 if (!this.loggedIn){
-                    window.location.href = "/expired";
+                    window.location.href = "/aPanel/expired";
                 }
             }
         }

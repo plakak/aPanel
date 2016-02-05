@@ -2,13 +2,13 @@ doctype html
 html(lang='en')
     head
         meta(charset='utf-8')
-        link(rel='stylesheet', href='/css/bootstrap.min.css')
-        link(rel='stylesheet', href='/css/styles.css')
+        link(rel='stylesheet', href='/aPanel/css/bootstrap.min.css')
+        link(rel='stylesheet', href='/aPanel/css/styles.css')
         title aPanel - setup
     body
         if authorized
             section
-                form(action='/init', class='form-group' method='post')
+                form(action='/aPanel/init', class='form-group' method='post')
                     h3 Register an admin account
                     hr
                     if error
@@ -34,4 +34,4 @@ html(lang='en')
                 });
         else
             script(type="text/javascript").
-                window.location.href = '/';
+                window.location.href = '/aPanel/';

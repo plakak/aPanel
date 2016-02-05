@@ -2,8 +2,8 @@ doctype html
 html(lang='en')
     head
         meta(charset='utf-8')
-        link(rel='stylesheet', href='/css/bootstrap.min.css')
-        link(rel='stylesheet', href='/css/styles.css')
+        link(rel='stylesheet', href='/aPanel/css/bootstrap.min.css')
+        link(rel='stylesheet', href='/aPanel/css/styles.css')
         title aPanel
     body
         if auth
@@ -11,11 +11,11 @@ html(lang='en')
             script(type='text/javascript').
                 var isLoggedIn = !{(JSON.stringify(auth))};
 
-            script(src="http://localhost:8080/public/static/js/build.js")
+            script(src="http://localhost:8080/public/static/aPanel/js/build.js")
         else
-            a(href="/" class='intro') aPanel login
+            a(href="/aPanel" class='intro') aPanel login
             section
-                form(action='/login', class='form-group' method='post')
+                form(action='/aPanel/login', class='form-group' method='post')
                     if expired
                         small(class="error") Session expired. Please log in again.
                     if error
