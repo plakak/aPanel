@@ -1,3 +1,6 @@
+var autoprefixer = require('autoprefixer');
+var path = require('path');
+
 module.exports = {
 
     entry: ['./src/index.js'],
@@ -7,25 +10,21 @@ module.exports = {
         publicPath: 'http://localhost:8080/public/static/aPanel/js/',
         filename: 'build.js'
     },
-
     vue: {
         loaders: {
             sass: 'style!css!sass?indentedSyntax',
-            scss: 'style!css!sass'
+            scss: 'style!css!sass',
+            css: 'style-loader!css-loader!postcss-loader'
         },
         postcss: [
-            require('lost')
+            require('lost'),
+            autoprefixer({ browsers: ['last 2 versions'] })
         ]
     },
-
-
     module: {
         loaders: [
             // process *.vue files using vue-loader
             { test: /\.vue$/, loader: 'vue' },
-            // process *.js files using babel-loader
-            // the exclude pattern is important so that we don't
-            // apply babel transform to all the dependencies!
             { test: /\.js$/, loader: 'babel', exclude: /node_modules/ }
         ]
     },
@@ -33,4 +32,4 @@ module.exports = {
         presets: ['es2015', 'stage-0'],
         plugins: ['transform-runtime']
     }
-}
+};

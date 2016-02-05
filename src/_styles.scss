@@ -1,0 +1,116 @@
+body {
+    background-color: #fefefe;
+}
+
+[v-cloak] {
+    display: none;
+}
+
+input {
+    display: block;
+    margin: 0 auto;
+}
+
+button {
+    margin-top: 20px;
+}
+
+.large-space {
+    margin-top: 5em;
+}
+
+.small-space{
+    margin-top: 2em;
+}
+
+section {
+    text-align: center;
+    max-width: 500px;
+    margin: 5em auto;
+}
+
+p {
+    font-size: 2em;
+}
+
+.break {
+    word-break: break-all;
+}
+
+.error {
+    color: #e90d00;
+    font-size: 0.9em;
+    margin-bottom: 5px;
+}
+
+.flexbox #odp {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2em;
+    align-items: center;
+}
+
+.flexbox .before {
+    width: 5em;
+    border-top: 3px solid black;
+}
+
+.flexbox .center {
+    font-size: 3em;
+}
+
+.flexbox .after {
+    width: 5em;
+    border-top: 3px solid black;
+}
+
+.no-flexbox #odp {
+    margin-top: 2em;
+    display: inline-block;
+    align-items: center;
+}
+
+.no-flexbox .before {
+    width: 5em;
+    display: block;
+    margin: 0 auto;
+    border-top: 3px solid black;
+}
+
+.no-flexbox .center {
+    display: block;
+    font-size: 3em;
+    padding: 20px;
+}
+
+.no-flexbox .after {
+    display: block;
+    width: 5em;
+    margin: 0 auto;
+    border-top: 3px solid black;
+}
+
+#inst {
+    transition: opacity .4s linear;
+}
+
+small {
+    display: block;
+}
+
+.intro {
+    display: inline-block;
+    text-align: center;
+    font-size: 3em;
+    width: 100%;
+    margin: 30px auto 0;
+}
+
+.intro:hover{
+    text-decoration: none;
+}
+
+#guzik {
+    opacity: 0;
+    transition: opacity .4s linear;
+}

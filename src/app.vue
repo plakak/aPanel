@@ -1,5 +1,7 @@
 <style lang="scss">
 
+    @import 'styles';
+
     $brand-primary: darken(#428bca, 6.5%) !default; // #337ab7
 
    .navbar {
@@ -13,6 +15,7 @@
     .footer-logout {
         margin-top: 50px;
     }
+
 </style>
 
 <template>
@@ -23,7 +26,7 @@
                     <a class="navbar-brand" v-link="'/home'">aPanel</a>
                 </div>
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="/logout">Logout</a></li>
+                    <li><a href="/aPanel/logout">Logout</a></li>
                 </ul>
             </div>
         </nav>
