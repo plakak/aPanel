@@ -1,0 +1,25 @@
+doctype html
+html(lang='en')
+    head
+        meta(charset='utf-8')
+        link(rel='stylesheet', href='/css/bootstrap.min.css')
+        link(rel='stylesheet', href='/css/styles.css')
+        title aPanel
+    body
+        if auth
+            #app
+            script(type='text/javascript').
+                var isLoggedIn = !{(JSON.stringify(auth))};
+
+            script(src="http://localhost:8080/public/static/js/build.js")
+        else
+            a(href="/" class='intro') aPanel login
+            section
+                form(action='/login', class='form-group' method='post')
+                    if expired
+                        h3 Session expired. Please log in again.
+                    label(for='username') Username
+                    input(type="text" id='username', name='username', class="form-control")
+                    label(for='password') Password
+                    input(type='password', id='password', name='password', class="form-control")
+                    button(type="submit" class='btn btn-default btn-primary') Login
