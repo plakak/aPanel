@@ -9,8 +9,8 @@ var flash = require('connect-flash');
 
 var port = process.env.PORT || 8000;
 
-var DB_URI = require('./config/userSettings').dbUri;
-var DB_CRED = require('./config/userSettings').dbCred;
+var DB_URI = require('./config/user-settings').dbUri;
+var DB_CRED = require('./config/user-settings').dbCred;
 
 app.use(morgan('dev'));
 app.use(flash());
@@ -28,7 +28,7 @@ var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function () {console.log('db connected')});
 
-require('./config/passportConfig')(app);
+require('./config/passport-config')(app);
 require('./config/routes.js')(app, express);
 
 
