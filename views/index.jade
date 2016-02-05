@@ -17,7 +17,9 @@ html(lang='en')
             section
                 form(action='/login', class='form-group' method='post')
                     if expired
-                        h3 Session expired. Please log in again.
+                        small(class="error") Session expired. Please log in again.
+                    if error
+                        small(class="error") #{error}
                     label(for='username') Username
                     input(type="text" id='username', name='username', class="form-control")
                     label(for='password') Password

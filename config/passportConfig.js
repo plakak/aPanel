@@ -10,14 +10,10 @@ module.exports = function(app) {
 
     passport.use(new LocalStrategy(
         function (username, password, done) {
-            User.findOne({user: username}, function (err, user) {
+            User.findOne({username: username}, function (err, user) {
                 if (err) {
                     return done(err);
-                }
-                if (!user || !password) {
-                    return done(null, false, {message: 'Please provide username and password'});
-                }
-                else {
+                } else {
                     user.validPassword(password, function(err) {
                         if (err) {
                             return done(null, false, {message: 'Wrong username or password.'});
@@ -29,7 +25,7 @@ module.exports = function(app) {
     ));
 
     passport.serializeUser(function (user, done) {
-        var sessionUser = {_id: user._id, username: user.user};
+        var sessionUser = {_id: user._id, username: user.username};
         done(null, sessionUser);
     });
 
