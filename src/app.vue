@@ -1,20 +1,28 @@
 <style lang="scss">
 
-    @import 'styles';
+    @import 'style/_styles.scss';
+    @lost flexbox flex;
 
-    $brand-primary: darken(#428bca, 6.5%) !default; // #337ab7
+    $brand-primary: darken(red, 6.5%) !default; // #337ab7
 
    .navbar {
        margin: 20px auto 40px;
+    }
+
+   .navbar-brand {
+        font-size: 3em;
    }
+
     .footer{
         border-top: 1px solid $brand-primary;
         padding-top: 20px;
         margin-top: 20px;
     }
+
     .footer-logout {
         margin-top: 50px;
     }
+
 
 </style>
 
@@ -26,6 +34,7 @@
                     <a class="navbar-brand" v-link="'/home'">aPanel</a>
                 </div>
                 <ul class="nav navbar-nav navbar-right">
+                    <li><a v-link="'/users'">Users Management</a></li>
                     <li><a href="/aPanel/logout">Logout</a></li>
                 </ul>
             </div>

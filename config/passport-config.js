@@ -3,8 +3,10 @@ var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var User = require("./models/user").User;
 
+//1800000
+
 module.exports = function(app) {
-    app.use(session({secret: process.env.SECRET, cookie: {maxAge: 1800000}, resave: false, saveUninitialized: false}));
+    app.use(session({secret: process.env.SECRET, cookie: {maxAge: 999900000}, resave: false, saveUninitialized: false}));
     app.use(passport.initialize());
     app.use(passport.session());
 

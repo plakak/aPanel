@@ -2,8 +2,9 @@ doctype html
 html(lang='en')
     head
         meta(charset='utf-8')
-        link(rel='stylesheet', href='/aPanel/css/bootstrap.min.css')
+
         if !auth
+            link(rel='stylesheet', href='/aPanel/css/bootstrap.min.css')
             link(rel='stylesheet', href='/aPanel/css/styles.css')
         title aPanel
     body
