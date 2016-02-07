@@ -27,7 +27,11 @@ module.exports = function(app) {
     ));
 
     passport.serializeUser(function (user, done) {
-        var sessionUser = {_id: user._id, username: user.username};
+        var sessionUser = {
+            _id: user._id,
+            username: user.username,
+            lastLogin: Date.parse(user.lastLogin)
+        };
         done(null, sessionUser);
     });
 

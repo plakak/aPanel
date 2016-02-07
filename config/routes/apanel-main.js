@@ -1,6 +1,7 @@
 var passport = require('passport');
 var initCheck = require('../helpers/init');
 var addUser = require('../models/user').addUser;
+var updateLoginDate = require('../models/user').updateLoginDate;
 var express = require('express');
 
 var router = express.Router();
@@ -36,6 +37,7 @@ router.post('/login', passport.authenticate('local',
         badRequestMessage: 'Username and password are required to login.'
     }
 ), function(req, res){
+        updateLoginDate(req.user.username);
         res.redirect('/aPanel/');
     }
 );

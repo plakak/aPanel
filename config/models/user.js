@@ -4,7 +4,8 @@ var bcrypt = require('../helpers/bcrypt');
 const userSchema = mongoose.Schema({
     username: String,
     email: String,
-    password: String
+    password: String,
+    lastLogin: Date
 });
 
 userSchema.methods.validPassword = function(pwd, callback) {
@@ -37,9 +38,18 @@ const addUser = function(req, callback) {
     });
 };
 
+const updateLoginDate = function(user) {
+  User.findOneAndUpdate({username: user}, {lastLogin: Date.now()}, {upsert: true}, function(err) {
+      if(err) {
+          console.log(err);
+      }
+  });
+};
+
 module.exports = {
     User: User,
-    addUser: addUser
+    addUser: addUser,
+    updateLoginDate: updateLoginDate
 };
 
 

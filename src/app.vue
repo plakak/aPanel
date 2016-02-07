@@ -3,8 +3,9 @@
     @import 'style/_styles.scss';
     @lost flexbox flex;
 
-    $brand-primary: darken(red, 6.5%) !default; // #337ab7
-
+    .bg {
+        background-color: $well-bg;
+    }
    .navbar {
        margin: 20px auto 40px;
     }
@@ -14,7 +15,7 @@
    }
 
     .footer{
-        border-top: 1px solid $brand-primary;
+        border-top: 1px solid $btn-default-border;
         padding-top: 20px;
         margin-top: 20px;
     }
@@ -40,9 +41,31 @@
             </div>
         </nav>
         <div class="container">
-            <div class="row" style="margin-left: -30px">
-                <div class="col-sm-12">
-                    {{ loggedIn }}
+            <div class="row">
+                <div class="col-sm-3">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <h5>Hello, {{ loggedIn }}</h5>
+
+                            <p>Last looged in: {{lastLogin}}</p>
+
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <ul class="nav nav-pills nav-stacked">
+                                <li><a href="#" class=""> Pages </a></li>
+
+                                <li><a href="#" class=""> Posts </a></li>
+
+                                <li><a href="#" class="">Media</a></li>
+                                </ul>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-9">
                     <router-view></router-view>
                 </div>
             </div>
@@ -62,12 +85,17 @@
 
 <script type="text/babel">
 
-    import axios from 'axios';
+    import moment from 'moment';
 
     export default {
         data() {
             return {
                 loggedIn: isLoggedIn.username
+            }
+        },
+        computed: {
+            lastLogin() {
+                return moment(isLoggedIn.lastLogin).format('DD-MMM-YYYY HH:mm');
             }
         },
         watch: {
