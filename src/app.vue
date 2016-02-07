@@ -54,11 +54,11 @@
                     <div class="panel panel-default">
                         <div class="panel-body">
                             <ul class="nav nav-pills nav-stacked">
-                                <li><a href="#" class=""> Pages </a></li>
+                                <li><a v-link="'/posts'"> Pages </a></li>
 
-                                <li><a href="#" class=""> Posts </a></li>
+                                <li><a href="#"> Posts </a></li>
 
-                                <li><a href="#" class="">Media</a></li>
+                                <li><a href="#">Media</a></li>
                                 </ul>
 
                         </div>
@@ -87,6 +87,7 @@
 
     import moment from 'moment';
 
+
     export default {
         data() {
             return {
@@ -96,13 +97,6 @@
         computed: {
             lastLogin() {
                 return moment(isLoggedIn.lastLogin).format('DD-MMM-YYYY HH:mm');
-            }
-        },
-        watch: {
-            'loggedIn'(){
-                if (!this.loggedIn){
-                    window.location.href = "/aPanel/expired";
-                }
             }
         }
     }

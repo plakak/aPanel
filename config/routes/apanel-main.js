@@ -42,6 +42,12 @@ router.post('/login', passport.authenticate('local',
     }
 );
 
+router.get('/sessionCheck', function(req,res) {
+   if (req.user) {
+       res.json({auth: true});
+   } else res.json({auth:false});
+});
+
 router.get('/', function(req, res){
     res.render('index.jade', {auth: req.user, error: req.flash('error')});
 });
