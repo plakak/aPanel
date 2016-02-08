@@ -1,8 +1,39 @@
 
 @import 'bootstrap';
+@import 'mixins';
+@import url(https://fonts.googleapis.com/css?family=Lato:300,400,400italic,700);
+
+html, body {
+  box-sizing: border-box;
+  font-size: 16px;
+  font-family: 'Lato', sans-serif;
+  font-weight: 400;
+}
+
+
+.panel-body.color-bar-info {
+  @include color-bar(#870b2f, "Informations");
+}
+
+.panel-body.color-bar-nav {
+  @include color-bar(#006E9D, "Navigation");
+}
 
 body {
-  background-color: #fefefe;
+  background-color: lighten(#EDEFF0, 1%);
+}
+
+.annotation {
+  font-size: 0.850em;
+}
+
+h5 {
+  font-size: 1.5em;
+  font-weight: 700;
+}
+
+.box-shadow {
+  box-shadow: 1px 5px 10px rgba(0,0,0,.2);
 }
 
 [v-cloak] {
@@ -30,16 +61,4 @@ button {
 
 small {
   display: block;
-}
-
-.intro {
-  display: inline-block;
-  text-align: center;
-  font-size: 3em;
-  width: 100%;
-  margin: 30px auto 0;
-}
-
-.intro:hover {
-  text-decoration: none;
 }

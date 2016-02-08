@@ -3,9 +3,6 @@
     @import 'style/_styles.scss';
     @lost flexbox flex;
 
-    .bg {
-        background-color: $well-bg;
-    }
    .navbar {
        margin: 20px auto 40px;
     }
@@ -19,11 +16,6 @@
         padding-top: 20px;
         margin-top: 20px;
     }
-
-    .footer-logout {
-        margin-top: 50px;
-    }
-
 
 </style>
 
@@ -43,16 +35,17 @@
         <div class="container">
             <div class="row">
                 <div class="col-sm-3">
-                    <div class="panel panel-default">
-                        <div class="panel-body">
-                            <h5>Hello, {{ loggedIn }}</h5>
+                    <div class="panel panel-default box-shadow">
+                        <div class="panel-body color-bar-info">
+                            <div class="">
+                                <h5>Hello, {{ loggedIn }}</h5>
 
-                            <p>Last looged in: {{lastLogin}}</p>
-
+                                <p class="annotation">Last looged in: {{lastLogin}}</p>
+                            </div>
                         </div>
                     </div>
-                    <div class="panel panel-default">
-                        <div class="panel-body">
+                    <div class="panel panel-default box-shadow">
+                        <div class="panel-body color-bar-nav">
                             <ul class="nav nav-pills nav-stacked">
                                 <li><a v-link="'/posts'"> Pages </a></li>
 
@@ -86,7 +79,6 @@
 <script type="text/babel">
 
     import moment from 'moment';
-
 
     export default {
         data() {
