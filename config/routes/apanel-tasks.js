@@ -1,5 +1,6 @@
-var addUser = require('../models/user').addUser;
 var express = require('express');
+
+var Settings = require('../models/settings').Settings;
 
 const checkAuth = function(req,res,next) {
     if (req.isAuthenticated()){
@@ -12,7 +13,18 @@ var router = express.Router();
 
 router.all('*', checkAuth);
 
-router.get('getData/:type?/:id?', (req,res) => {
+router.get('/getData/siteStatus', (req, res) => {
+    Settings.findOne().lean().exec((err, data) => {
+            if (!err) {
+            res.json(data);
+
+        } else {
+            res.end(err);
+        }
+    });
+});
+
+router.get('/getData/:type?/:id?', (req,res) => {
     res.end('authWorks')
 });
 

@@ -6,7 +6,7 @@ module.exports =  (req, res, next) => {
         if (!err) {
             var setting = data[0];
 
-            if (!setting.siteActive) {
+            if (!setting.siteActive && !req.path.match(/\/aPanel\/?.+/)) {
 
                 res.render('offline.jade', {message: setting.offlineDescription, pageTitle: setting.siteName});
 
