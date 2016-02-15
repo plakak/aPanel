@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import App from './app.vue';
-import Home from './views/home.vue';
+import Pages from './views/pages.vue';
 import VueRouter from 'vue-router';
 import VueResource from 'vue-resource';
 import axios from 'axios';
@@ -13,8 +13,8 @@ export var router = new VueRouter();
 Vue.config.debug = true;
 
 router.map({
-    '/home': {
-        component: Home
+    '/pages': {
+        component: Pages
     }
     //'/posts': {
     //    component: Posts
@@ -25,7 +25,7 @@ router.map({
 });
 
 router.redirect({
-    '*': '/home'
+    '*': '/pages'
 });
 
 router.beforeEach(function (transition) {

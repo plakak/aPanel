@@ -17,6 +17,16 @@
         margin-top: 20px;
     }
 
+    .color-bar-error{
+        position: relative;
+
+        & .close {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+        }
+    }
+
 </style>
 
 <template>
@@ -27,6 +37,7 @@
                     <a class="navbar-brand" v-link="'/home'">aPanel</a>
                 </div>
                 <ul class="nav navbar-nav navbar-right">
+                    <li><a v-link="'/site'" @click='killSite()'>Site Management</a></li>
                     <li><a v-link="'/users'">Users Management</a></li>
                     <li><a href="/aPanel/logout">Logout</a></li>
                 </ul>
@@ -59,6 +70,12 @@
                 </div>
 
                 <div class="col-sm-9">
+                    <div class="panel panel-default box-shadow" v-if="!siteActive && !dismissed">
+                        <div class="panel-body color-bar-error">
+                            <span class="close glyphicon glyphicon-remove" @click="hideWarning()"></span>
+                            <button class="btn btn-block btn-success" @click="activateSite()">"Turn site on"</button>
+                        </div>
+                    </div>
                     <router-view></router-view>
                 </div>
             </div>
@@ -79,16 +96,51 @@
 <script type="text/babel">
 
     import moment from 'moment';
+    import axios from 'axios';
 
     export default {
+
         data() {
             return {
+                siteActive: true,
+                offlineDescription: '',
+                siteName: '',
+                dismissed: false,
                 loggedIn: isLoggedIn.username
+            }
+        },
+        beforeCompile() {
+            axios.get('/aPanel/tasks/getData/siteStatus/')
+                    .then(response => {
+                        this.$set('siteActive',response.data.siteActive);
+                        this.$set('offlineDescription', response.offlineDescription || "We'll be back soon!");
+                        this.$set('siteName', response.siteName);
+                    });
+        },
+        methods: {
+            hideWarning() {
+                this.$set('dismissed', true);
+                console.log(this.dismissed);
+            },
+            activateSite(){
+                axios.post('/aPanel/tasks/getData/siteStatus/', {siteActive: !this.siteActive})
+                    .then(response =>  this.$set('siteActive', !this.siteActive))
+                    .catch(err => console.log(err));
+            },
+            //for testing
+            killSite(){
+                axios.post('/aPanel/tasks/getData/siteStatus/', {siteActive: !this.siteActive})
+                        .then(response =>  this.$set('siteActive', !this.siteActive))
+                        .catch(err => console.log(err));
             }
         },
         computed: {
             lastLogin() {
-                return moment(isLoggedIn.lastLogin).format('DD-MMM-YYYY HH:mm');
+                if (isLoggedIn.lastLogin) {
+                    return moment(isLoggedIn.lastLogin).format('DD-MMM-YYYY HH:mm');
+                } else {
+                    return "It's your first time!"
+                }
             }
         }
     }

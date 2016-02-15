@@ -24,6 +24,13 @@ router.get('/getData/siteStatus', (req, res) => {
     });
 });
 
+router.post('/getData/siteStatus', (req, res) => {
+
+    Settings.findOneAndUpdate({siteActive: !req.body.siteActive}, {siteActive: req.body.siteActive}, (err, suc) => {
+        res.json(suc);
+    });
+});
+
 router.get('/getData/:type?/:id?', (req,res) => {
     res.end('authWorks')
 });

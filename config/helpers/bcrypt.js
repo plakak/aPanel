@@ -1,22 +1,26 @@
 var bcrypt = require('bcrypt');
 
-exports.encrypt = function(plainText, callback){
-    bcrypt.genSalt(10, function(err, salt) {
-        bcrypt.hash(plainText, salt, function(err, hash) {
-            if (err) {
-                console.log(err);
-                callback(err, null);
-            } else {
-                callback(null, hash);
-            }
+exports.encrypt = plainText => {
+    return new Promise((resolve,reject) => {
+        bcrypt.genSalt(10, (err, salt) => {
+            bcrypt.hash(plainText, salt, (err, hash) => {
+                if (err) {
+                    reject(err);
+                } else {
+                     resolve(hash);
+                 }
+            });
         });
     });
 };
 
-exports.check = function(plainText, encodedHash, callback) {
-    bcrypt.compare(plainText, encodedHash, function (err, isMatch) {
-        if (!err && isMatch) {
-            callback(null, true);
-        } else callback('error', err, isMatch);
-    });
+exports.check = function(plainText, encodedHash) {
+
+    return new Promise((resolve, reject) => {
+        bcrypt.compare(plainText, encodedHash, (err, isMatch) => {
+            if (!err && isMatch) {
+                resolve();
+            } else reject(err);
+        });
+    })
 };

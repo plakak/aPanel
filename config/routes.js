@@ -8,5 +8,8 @@ module.exports = function(app) {
     app.use('/aPanel/tasks', aPanelTasksRoutes);
     app.use('/aPanel', aPanelMainRoutes);
     app.use('/', publicRoutes);
+    app.use((req, res) => {
+        res.status(404).render('404.jade');
+    });
 
 };

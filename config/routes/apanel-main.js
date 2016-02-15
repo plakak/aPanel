@@ -12,13 +12,13 @@ router.get('/init', initCheck, (req, res) => {
 });
 
 router.post('/init', initCheck, (req, res) => {
-    addUser(req, (err, success) => {
-        if (!err && success) {
-            res.redirect('/aPanel/');
-        } else {
-            res.render('init.jade', {authorized: true, error: true});
-        }
-    });
+    addUser(req)
+        .then(data => {
+            if (data){
+                res.redirect('/aPanel/');
+            }
+        })
+        .catch(() => res.render('init.jade', {authorized: true, error: true}));
 });
 
 router.get('/expired', (req, res) => {

@@ -10,23 +10,25 @@ module.exports = function(app) {
     app.use(passport.initialize());
     app.use(passport.session());
 
-    passport.use(new LocalStrategy(
-        function (username, password, done) {
-            User.findOne({username: username}, function (err, user) {
+    passport.use(new LocalStrategy((username, password, done) => {
+
+            User.findOne({username: username}, (err, user) => {
                 if (err) {
                     return done(err);
                 } else {
-                    user.validPassword(password, function(err) {
-                        if (err) {
-                            return done(null, false, {message: 'Wrong username or password.'});
-                        } else return done(null, user);
-                    });
+                    if (!user) {
+                        done(null, false, {message: 'Wrong username or password.'})
+                    } else {
+                        user.validPassword(password)
+                            .then(() => done(null, user))
+                            .catch(err => done(null, false, {message: 'Wrong username or password.'}));
+                    }
                 }
             });
         }
     ));
 
-    passport.serializeUser(function (user, done) {
+    passport.serializeUser((user, done) => {
         var sessionUser = {
             _id: user._id,
             username: user.username,
@@ -35,7 +37,7 @@ module.exports = function(app) {
         done(null, sessionUser);
     });
 
-    passport.deserializeUser(function (sessionUser, done) {
+    passport.deserializeUser((sessionUser, done)  => {
         done(null, sessionUser);
     });
 };

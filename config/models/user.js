@@ -8,38 +8,44 @@ const userSchema = mongoose.Schema({
     lastLogin: Date
 });
 
-userSchema.methods.validPassword = function(pwd, callback) {
-   bcrypt.check(pwd, this.password, function(err) {
-       if (!err) {
-           callback(null, true)
-       } else callback(err);
-   });
+userSchema.methods.validPassword = function(pwd) {
+    return new Promise((resolve, reject) => {
+        bcrypt.check(pwd, this.password)
+            .then(() => resolve())
+            .catch(err => reject(err));
+    })
 };
 
 const User = mongoose.model('Users', userSchema);
 
-const addUser = function(req, callback) {
-    bcrypt.encrypt(req.body.password, function(err, encPasswd) {
-        if (!err) {
-            var register_data = {
-                username: req.body.username,
-                password: encPasswd
-            };
+const addUser = req => {
 
-            var newUser = new User(register_data);
+    return new Promise((resolve, reject) => {
 
-            newUser.save(function (error, data) {
-                if (!error) {
-                    callback(null, data);
-                } else callback(error, null);
-            });
+        bcrypt.encrypt(req.body.password)
+            .then(encPasswd => {
 
-        } else callback(err, null);
+                var register_data = {
+                    username: req.body.username,
+                    password: encPasswd
+                };
+
+                var newUser = new User(register_data);
+
+                newUser.save((error, data) => {
+                    if (!error) {
+                        resolve(data);
+                    } else {
+                        reject(data);
+                    }
+                });
+            })
+            .catch(err => reject(err))
     });
 };
 
-const updateLoginDate = function(user) {
-  User.findOneAndUpdate({username: user}, {lastLogin: Date.now()}, {upsert: true}, function(err) {
+const updateLoginDate = user => {
+  User.findOneAndUpdate({username: user}, {lastLogin: Date.now()}, {upsert: true}, err => {
       if(err) {
           console.log(err);
       }

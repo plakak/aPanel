@@ -8,6 +8,14 @@
 // <a href="#"><span class="glyphicon glyphicon-star"></span> Star</a>
 
 @at-root {
+
+  // [converter] This is because some asset helpers, such as Sprockets, do not work with file-relative paths.
+  $icon-font-path:          "/aPanel/style/bootstrap/fonts/bootstrap/" !default;
+
+  //** File name for all font files.
+  $icon-font-name:          "glyphicons-halflings-regular" !default;
+
+
   // Import the fonts
   @font-face {
     font-family: 'Glyphicons Halflings';

@@ -11,12 +11,22 @@ html, body {
 }
 
 
-.panel-body.color-bar-info {
+.color-bar-info {
   @include color-bar(#870b2f, "Informations");
 }
 
-.panel-body.color-bar-nav {
+.color-bar-nav {
   @include color-bar(#006E9D, "Navigation");
+}
+.color-bar-error {
+  @include color-bar(#d72822, "Warning! Site is inactive!");
+}
+.color-bar-success {
+  @include color-bar(darken(#49e670, 20%), "");
+}
+
+.color-bar-pages {
+  @include color-bar(#d5703a, "Pages");
 }
 
 body {
