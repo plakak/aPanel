@@ -1,11 +1,10 @@
-doctype html
-html(lang='en')
-    head
-        meta(charset='utf-8')
-        title #{pageTitle}
-    body
-        include ../public/dist/offline.html
 
-        script(type="text/javascript").
-            var description = !{JSON.stringify(message)};
-            document.querySelector('#description').innerHTML = description;
+include ../public/dist/offline.html
+
+script(type="text/javascript").
+    var description = !{JSON.stringify(message)};
+    var pageName = !{JSON.stringify(pageTitle)};
+    document.querySelector('#description').innerHTML = description;
+    if (pageName) {
+        document.title = pageName;
+    }
