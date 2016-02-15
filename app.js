@@ -12,6 +12,8 @@ var port = process.env.PORT || 8000;
 var DB_URI = require('./config/user-settings').dbUri;
 var DB_CRED = require('./config/user-settings').dbCred;
 
+var pageStatus = require('./config/helpers/page-status');
+
 app.use(morgan('dev'));
 app.use(flash());
 app.use(bodyParser.json());
@@ -20,7 +22,7 @@ app.set('view engine', 'jade');
 app.use(cookieParser());
 
 app.use('/aPanel', express.static(__dirname + '/public/static/aPanel'));
-app.use('/', express.static(__dirname + '/public/dist'));
+app.use('/', pageStatus, express.static(__dirname + '/public/dist'));
 
 mongoose.connect(DB_URI, DB_CRED);
 
