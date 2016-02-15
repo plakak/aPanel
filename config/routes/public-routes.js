@@ -3,7 +3,7 @@ var express = require('express');
 var router = express.Router();
 
 
-router.get('/getData/:type/:id?/', function(req, res){
+router.get('/getData/:type/:id?/', (req, res) => {
     res.end(req.path);
 });
 

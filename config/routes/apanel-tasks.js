@@ -12,7 +12,7 @@ var router = express.Router();
 
 router.all('*', checkAuth);
 
-router.get('getData/:type?/:id?', function(req,res){
+router.get('getData/:type?/:id?', (req,res) => {
     res.end('authWorks')
 });
 

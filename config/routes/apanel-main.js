@@ -7,12 +7,12 @@ var express = require('express');
 var router = express.Router();
 
 
-router.get('/init', initCheck, function(req, res){
+router.get('/init', initCheck, (req, res) => {
     res.render('init.jade', {authorized: true});
 });
 
-router.post('/init', initCheck, function(req, res) {
-    addUser(req, function(err, success){
+router.post('/init', initCheck, (req, res) => {
+    addUser(req, (err, success) => {
         if (!err && success) {
             res.redirect('/aPanel/');
         } else {
@@ -21,11 +21,11 @@ router.post('/init', initCheck, function(req, res) {
     });
 });
 
-router.get('/expired', function(req, res){
+router.get('/expired', (req, res) => {
     res.render('index.jade', {auth: req.user, expired: true});
 });
 
-router.get('/logout', function(req, res){
+router.get('/logout', (req, res) => {
     req.logout();
     res.redirect('/aPanel/');
 });
@@ -36,19 +36,19 @@ router.post('/login', passport.authenticate('local',
         failureFlash: true,
         badRequestMessage: 'Username and password are required to login.'
     }
-), function(req, res){
+), (req, res) => {
         updateLoginDate(req.user.username);
         res.redirect('/aPanel/');
     }
 );
 
-router.get('/sessionCheck', function(req,res) {
+router.get('/sessionCheck', (req,res) => {
    if (req.user) {
        res.json({auth: true});
    } else res.json({auth:false});
 });
 
-router.get('/', function(req, res){
+router.get('/', (req, res) => {
     res.render('index.jade', {auth: req.user, error: req.flash('error')});
 });
 
