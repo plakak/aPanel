@@ -93,7 +93,7 @@
                 <span class="indicator" :style="activeColor"> </span>
                 <div class="content">This is site name</div>
                 <span class="buttons">
-                    <i class="glyphicon" :class="activeIcon" @click='isActive = !isActive'></i>
+                    <i class="glyphicon" :class="activeIcon" @click='changeVisibility'></i>
                     <i class="glyphicon glyphicon-cog" @click='showDetails'></i>
                     <i class="glyphicon glyphicon-trash" @click='removePage'></i>
                 </span>
@@ -109,7 +109,7 @@
 
 
     export default {
-        props: ['pageData', 'showDetails', 'removePage'],
+        props: ['pageData', 'showDetails', 'removePage', 'changeVisibility'],
         data() {
             return {
                 isActive: false
@@ -119,12 +119,12 @@
         },
         computed: {
             activeColor() {
-                return this.isActive ? {backgroundColor: '#71c271'} : {backgroundColor: '#d5706b'};
+                return this.pageData.isActive ? {backgroundColor: '#71c271'} : {backgroundColor: '#d5706b'};
             },
             activeIcon() {
               return {
-                  'glyphicon-eye-open': !this.isActive,
-                  'glyphicon-eye-close': this.isActive
+                  'glyphicon-eye-open': !this.pageData.isActive,
+                  'glyphicon-eye-close': this.pageData.isActive
               }
             },
             details() {

@@ -53,13 +53,14 @@
                           :page-data="page"
                           :show-details="showDetails.bind(null, page)"
                           :remove-page="deleteHandler.bind(null,page)"
+                          :change-visibility="changeVisibility.bind(null, page)"
                     >
                     </page>
                 </div>
                 <div class="main-controls">
 
 
-                    <i class="glyphicon glyphicon-plus button"></i>
+                    <i class="glyphicon glyphicon-plus button" @click="tmpAdd"></i>
                     <i class="glyphicon glyphicon-duplicate button" @click="selectAll"></i>
 
 
@@ -98,20 +99,22 @@
                     toRemove: []
                 },
                 data: [
-                    {id: 1, title: 'myTitle', isSelected: false, isDetails: false},
-                    {id: 2, title: 'myTitle', isSelected: false, isDetails: false},
-                    {id: 3, title: 'myTitle', isSelected: false, isDetails: false},
-                    {id: 4, title: 'myTitle', isSelected: false, isDetails: false},
-                    {id: 5, title: 'myTitle', isSelected: false, isDetails: false},
-                    {id: 6, title: 'myTitle', isSelected: false, isDetails: false}
-                ]
-            }
+                    {title: 'myTitle', isActive: true, isSelected: false, isDetails: false},
+                    {title: 'myTitle', isActive: true, isSelected: false, isDetails: false},
+                    {title: 'myTitle', isActive: true, isSelected: false, isDetails: false},
+                    {title: 'myTitle', isActive: true, isSelected: false, isDetails: false},
+                    {title: 'myTitle', isActive: true, isSelected: false, isDetails: false},
+                    {title: 'myTitle', isActive: true, isSelected: false, isDetails: false}
+                ]           }
         },
         components: {
             page,
             modal
         },
         methods: {
+            tmpAdd(){
+                this.data.unshift({title: 'myTitle',  isSelected: false, isDetails: true})
+            },
             showDetails(page){
                 if (page.isSelected) {
                     this.data.forEach(item => {
@@ -133,6 +136,9 @@
                     item.isSelected =  !item.isSelected;
                 });
             },
+            changeVisibility(page){
+                page.isActive = !page.isActive;
+            },
             deleteHandler(page){
                 let selected = this.data.filter(e => e.isSelected);
 
@@ -143,15 +149,14 @@
                 } else {
                     this.$set('modal.items', `${page.title}?`);
                     this.$set('modal.modalIsOpen', !this.modal.modalIsOpen);
-                    this.$set('modal.toRemove', page);
+                    this.$set('modal.toRemove', [page]);
                 }
-
             },
             removePage(bool){
                 if (!bool){
                     this.$set('modal.modalIsOpen', !this.modal.modalIsOpen);
                 } else {
-                    this.modal.toRemove.forEach(item => this.$remove(item));
+                    this.modal.toRemove.forEach(item => this.data.$remove(item));
                     this.$set('modal.modalIsOpen', !this.modal.modalIsOpen);
                 }
             }
