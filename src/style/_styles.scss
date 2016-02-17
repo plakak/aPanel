@@ -12,11 +12,11 @@ html, body {
 
 
 .color-bar-info {
-  @include color-bar(#870b2f, "Informations");
+  @include color-bar(#46706b, "Informations");
 }
 
 .color-bar-nav {
-  @include color-bar(#006E9D, "Navigation");
+  @include color-bar(#4988ab, "Navigation");
 }
 .color-bar-error {
   @include color-bar(#d72822, "Warning! Site is inactive!");
@@ -26,7 +26,7 @@ html, body {
 }
 
 .color-bar-pages {
-  @include color-bar(#d5703a, "Pages");
+  @include color-bar(#4b4a3f, "Pages");
 }
 
 body {

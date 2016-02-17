@@ -18,7 +18,7 @@
         }
 
         &--open {
-             height: 300px;
+             height: 500px;
              transition: height .3s ease-out;
              overflow: auto;
              overflow-y: hidden;
@@ -58,12 +58,11 @@
     }
 
     .details {
-        border-top: 1px solid #d5703a;
-        border-bottom: 1px solid #d5703a;
         border-radius: 4px;
         display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
         flex-basis: 100%;
-        font-size: 4em;
         padding: 1rem;
         margin: 1rem;
         background-color: darken($backgrnd-color, 10%);
@@ -80,6 +79,16 @@
             width: 100%;
             background-color: rgba(#71aac2, 0.2);
         }
+    }
+
+    textarea {
+        min-height: 200px;
+        max-width: 100%;
+        max-height: 200px;
+    }
+
+    .info {
+        align-self: flex-end;
     }
 
 
@@ -99,6 +108,14 @@
                 </span>
             </div>
             <div class="details">
+                <div class="info">
+                    <p>Addend on</p>
+                    <p>Addend by</p>
+                </div>
+                <label for="title">Title</label>
+                <input type="text" name="title" id="title" v-model=pageData.title />
+                <label for="content">Content</label>
+                <textarea name="content" id="content" v-model="pageData.content"></textarea>
             </div>
         </div>
 

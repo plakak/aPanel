@@ -1,6 +1,7 @@
 var express = require('express');
 
 var Settings = require('../models/settings').Settings;
+var Page = require('../models/pages');
 
 const checkAuth = function(req,res,next) {
     if (req.isAuthenticated()){
@@ -25,14 +26,28 @@ router.get('/getData/siteStatus', (req, res) => {
 });
 
 router.post('/getData/siteStatus', (req, res) => {
-
     Settings.findOneAndUpdate({siteActive: !req.body.siteActive}, {siteActive: req.body.siteActive}, (err, suc) => {
         res.json(suc);
     });
 });
 
 router.get('/getData/:type?/:id?', (req,res) => {
-    res.end('authWorks')
+
+    if(!req.params.type){
+        res.status(404).end('No such type');
+    } else {
+
+        switch(req.params.type) {
+            case 'pages':
+                Page.returnPages()
+                    .then(data => res.json(data))
+                    .catch(err => console.log(err));
+                break;
+            default:
+                res.status(404).end('No such type');
+                break;
+        }
+    }
 });
 
 
