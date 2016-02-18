@@ -48,12 +48,13 @@
 
         <div class="panel panel-default box-shadow">
             <div class="panel-body color-bar-pages">
-                <div v-for="page in data">
+                <div v-for="page in pageData | orderBy 'datePublished' -1">
                     <page class="page_space"
                           :page-data="page"
                           :show-details="showDetails.bind(null, page)"
                           :remove-page="deleteHandler.bind(null,page)"
                           :change-visibility="changeVisibility.bind(null, page)"
+                          :save-edits="saveEdits.bind(null, page)"
                     >
                     </page>
                 </div>
@@ -91,6 +92,20 @@
     import page from '../components/page.vue'
 
     export default {
+        route: {
+           data(transition) {
+                axios.get('/aPanel/tasks/getData/pages')
+                        .then(response => {
+                            let pageData = response.data.map(e => {
+                                return Object.assign({}, e, {isDetails: false, isSelected: false, isSaved: true});
+                            });
+                            transition.next({
+                                pageData
+                            });
+                        });
+            },
+            waitForData: true
+        },
         data() {
             return {
                 modal: {
@@ -98,14 +113,8 @@
                     items: '',
                     toRemove: []
                 },
-                data: [
-                    {title: 'myTitle', isActive: true, isSelected: false, isDetails: false},
-                    {title: 'myTitle', isActive: true, isSelected: false, isDetails: false},
-                    {title: 'myTitle', isActive: true, isSelected: false, isDetails: false},
-                    {title: 'myTitle', isActive: true, isSelected: false, isDetails: false},
-                    {title: 'myTitle', isActive: true, isSelected: false, isDetails: false},
-                    {title: 'myTitle', isActive: true, isSelected: false, isDetails: false}
-                ]           }
+                pageData: []
+            }
         },
         components: {
             page,
@@ -113,11 +122,24 @@
         },
         methods: {
             tmpAdd(){
-                this.data.unshift({title: 'myTitle',  isSelected: false, isDetails: true})
+                this.$set('pageData',[
+                    ...this.pageData,
+                    {
+                        title: 'title',  isSelected: false, isDetails: true, isSaved: false, isActive: false
+                    }
+
+                ]);
+            },
+            saveEdits(page){
+                if (!page.isSaved) {
+                    axios.post('/aPanel/tasks/getData/pages/add', {title: page.title, content: page.content, by: "admin"})
+                    .then(() => { page.isSaved = true })
+                    .catch(err => console.log(err, 'error'));
+                }
             },
             showDetails(page){
                 if (page.isSelected) {
-                    this.data.forEach(item => {
+                    this.pageData.forEach(item => {
                         if (item.isSelected) {
                             item.isDetails = !item.isDetails;
                             item.isSelected = false;
@@ -126,21 +148,23 @@
                 } else {
                     page.isDetails = !page.isDetails;
 
-                    this.data.forEach(item => {
+                    this.pageData.forEach(item => {
                         item.isSelected = false;
                     });
                 }
             },
             selectAll(){
-                this.data.forEach(item => {
+                this.pageData.forEach(item => {
                     item.isSelected =  !item.isSelected;
                 });
             },
             changeVisibility(page){
-                page.isActive = !page.isActive;
+                if (page.isSaved) {
+                    page.isActive = !page.isActive;
+                }
             },
             deleteHandler(page){
-                let selected = this.data.filter(e => e.isSelected);
+                let selected = this.pageData.filter(e => e.isSelected);
 
                 if ( selected.length > 1){
                     this.$set('modal.items', `${selected.length} items?`);
@@ -155,10 +179,16 @@
             removePage(bool){
                 if (!bool){
                     this.$set('modal.modalIsOpen', !this.modal.modalIsOpen);
+                    this.$set('modal.toRemove', []);
                 } else {
-                    this.modal.toRemove.forEach(item => this.data.$remove(item));
+                    this.modal.toRemove.forEach(item => this._deletePage(item));
                     this.$set('modal.modalIsOpen', !this.modal.modalIsOpen);
                 }
+            },
+            _deletePage(page){
+                axios.post('/aPanel/tasks/getData/pages/remove', {title: page.title, datePublished: page.datePublished})
+                        .then(() => this.pageData.$remove(page))
+                        .catch(err => console.log(err, 'error'));
             }
         }
     }

@@ -28,6 +28,7 @@
     .page_heading {
         min-height: 50px;
         max-height: 50px;
+        padding-right: 20px;
         display: flex;
         flex-wrap: wrap;
         transition: height 1s linear;
@@ -45,14 +46,15 @@
 
     .content {
         margin: auto 0;
-        flex: 5;
+        flex: 6;
         padding-left: 1em;
         font-size: 1.2em;
     }
 
     .buttons {
-        flex: 1;
+        flex: 2;
         display: flex;
+        position: relative;
         justify-content: space-around;
         align-items: center;
     }
@@ -87,8 +89,27 @@
         max-height: 200px;
     }
 
+    input {
+        min-height: 50px;
+        min-width: 90%;
+    }
+
     .info {
         align-self: flex-end;
+    }
+
+    .save-alert {
+        color: #d72822;
+        font-weight: 700;
+    }
+
+    .lower-opacity {
+        opacity: 0.7;
+        color: gray;
+    }
+
+    .hide {
+        opacity: 0;
     }
 
 
@@ -100,16 +121,19 @@
             <div class="click-container"  @click="pageData.isSelected = !pageData.isSelected"></div>
             <div class="page_heading" :class="{'page_heading--selected': pageData.isSelected}">
                 <span class="indicator" :style="activeColor"> </span>
-                <div class="content">This is site name</div>
+                <div class="content">{{pageData.title}}</div>
                 <span class="buttons">
+                    <i class="glyphicon glyphicon glyphicon-ok save-button" :class="savedClass" @click='saveEdits'></i>
+                    <i class="glyphicon glyphicon glyphicon-remove cancel-button" :class="savedClass" @click='undoEdits'></i>
                     <i class="glyphicon" :class="activeIcon" @click='changeVisibility'></i>
                     <i class="glyphicon glyphicon-cog" @click='showDetails'></i>
                     <i class="glyphicon glyphicon-trash" @click='removePage'></i>
                 </span>
             </div>
             <div class="details">
+                <span class="save-alert" v-show="!pageData.isSaved">Warning - this site is not saved!</span>
                 <div class="info">
-                    <p>Addend on</p>
+                    <p>Addend on {{ pageData.datePublished }}</p>
                     <p>Addend by</p>
                 </div>
                 <label for="title">Title</label>
@@ -126,13 +150,10 @@
 
 
     export default {
-        props: ['pageData', 'showDetails', 'removePage', 'changeVisibility'],
+        props: ['pageData', 'showDetails', 'removePage', 'changeVisibility', 'saveEdits'],
         data() {
             return {
-                isActive: false
             }
-        },
-        ready(){
         },
         computed: {
             activeColor() {
@@ -141,7 +162,9 @@
             activeIcon() {
               return {
                   'glyphicon-eye-open': !this.pageData.isActive,
-                  'glyphicon-eye-close': this.pageData.isActive
+                  'glyphicon-eye-close': this.pageData.isActive,
+                  'lower-opacity': !this.pageData.isSaved
+
               }
             },
             details() {
@@ -149,12 +172,12 @@
                     'page_container--closed': !this.pageData.isDetails,
                     'page_container--open': this.pageData.isDetails
                 }
+            },
+            savedClass(){
+                return {
+                    'hide': this.pageData.isSaved
+                }
             }
-
-        },
-        methods: {
-
         }
-
     }
 </script>

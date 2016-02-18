@@ -9,7 +9,6 @@ const checkAuth = function(req,res,next) {
     } else res.status(401).end('Not authorized');
 };
 
-
 var router = express.Router();
 
 router.all('*', checkAuth);
@@ -29,6 +28,14 @@ router.post('/getData/siteStatus', (req, res) => {
     Settings.findOneAndUpdate({siteActive: !req.body.siteActive}, {siteActive: req.body.siteActive}, (err, suc) => {
         res.json(suc);
     });
+});
+
+router.post('/getData/pages/add' , (req, res) => {
+   Page.addPage(req).then(response => res.json(response))
+});
+
+router.post('/getData/pages/remove' , (req, res) => {
+    Page.removePage(req).then(response => res.json(response))
 });
 
 router.get('/getData/:type?/:id?', (req,res) => {

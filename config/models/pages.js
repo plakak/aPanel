@@ -2,9 +2,9 @@ var mongoose = require('mongoose');
 var bcrypt = require('../helpers/bcrypt');
 
 const pageSchema = mongoose.Schema({
-    title: String,
-    datePublished: Date,
-    dateEdited: Date,
+    title: {type: String, index: true},
+    datePublished: {type: Date, default: Date.now()},
+    dateEdited: {type: Date, default: Date.now()},
     content: String,
     by: String,
     isActive: Boolean
@@ -17,11 +17,11 @@ const addPage = req => {
 
         var newPageData = {
             title: req.body.title,
-            datePublished: req.body.datePublished,
-            dateEdited: req.body.dateEdited,
             content: req.body.content,
+            datePublished: Date.now(),
+            dateEdited: Date.now(),
             by: req.body.by,
-            isActive: req.body.isActive
+            isActive: false
         };
 
         var newPage = new Page(newPageData);
@@ -41,8 +41,7 @@ const editPage = req => {
 
         var updateData = {
             title: req.body.title,
-            datePublished: req.body.datePublished,
-            dateEdited: req.body.dateEdited,
+            dateEdited: Date.now(),
             content: req.body.content,
             by: req.body.by,
             isActive: req.body.isActive
