@@ -50,18 +50,18 @@
             <div class="panel-body color-bar-pages">
                 <div v-for="page in pageData | orderBy 'datePublished' -1">
                     <page class="page_space"
-                          :page-data="page"
+                          :external-data="page"
                           :show-details="showDetails.bind(null, page)"
                           :remove-page="deleteHandler.bind(null,page)"
                           :change-visibility="changeVisibility.bind(null, page)"
-                          :save-edits="saveEdits.bind(null, page)"
+                          :save-data="saveData.bind(null, page)"
                     >
                     </page>
                 </div>
                 <div class="main-controls">
 
 
-                    <i class="glyphicon glyphicon-plus button" @click="tmpAdd"></i>
+                    <i class="glyphicon glyphicon-plus button" @click="addNewPage"></i>
                     <i class="glyphicon glyphicon-duplicate button" @click="selectAll"></i>
 
 
@@ -88,6 +88,7 @@
 
     import axios from 'axios';
     import { modal } from 'vue-strap';
+    import moment from 'moment'
 
     import page from '../components/page.vue'
 
@@ -97,7 +98,7 @@
                 axios.get('/aPanel/tasks/getData/pages')
                         .then(response => {
                             let pageData = response.data.map(e => {
-                                return Object.assign({}, e, {isDetails: false, isSelected: false, isSaved: true});
+                                return Object.assign({}, e, {isDetails: false, isSelected: false, isSaved: true, isEdited: false});
                             });
                             transition.next({
                                 pageData
@@ -121,20 +122,31 @@
             modal
         },
         methods: {
-            tmpAdd(){
+            addNewPage(){
                 this.$set('pageData',[
                     ...this.pageData,
                     {
-                        title: 'title',  isSelected: false, isDetails: true, isSaved: false, isActive: false
+                        title: '',  isSelected: false, isDetails: true, isSaved: false, isActive: false, isEdited: false
                     }
 
                 ]);
             },
-            saveEdits(page){
+            saveData(page, data){
                 if (!page.isSaved) {
-                    axios.post('/aPanel/tasks/getData/pages/add', {title: page.title, content: page.content, by: "admin"})
-                    .then(() => { page.isSaved = true })
+                    axios.post('/aPanel/tasks/getData/pages/add', {title: data.title, content: data.content, by: isLoggedIn.username})
+                    .then(() => { page.isSaved = true; page.isEdited = false; })
                     .catch(err => console.log(err, 'error'));
+                } else {
+                    axios.post('/aPanel/tasks/getData/pages/edit', {title: data.title, content: data.content, id: page._id})
+                            .then((resp) => {
+                                console.log(resp)
+                                page.isEdited = false;
+                                page.title = resp.data.title;
+                                page.content = resp.data.content;
+                                page.dateEdited= moment.now();
+
+                            })
+                            .catch(err => console.log(err, 'error'));
                 }
             },
             showDetails(page){
@@ -164,16 +176,21 @@
                 }
             },
             deleteHandler(page){
-                let selected = this.pageData.filter(e => e.isSelected);
-
-                if ( selected.length > 1){
-                    this.$set('modal.items', `${selected.length} items?`);
-                    this.$set('modal.modalIsOpen', !this.modal.modalIsOpen);
-                    this.$set('modal.toRemove', selected);
+                if(!page.isSaved) {
+                    this.pageData.$remove(page);
                 } else {
-                    this.$set('modal.items', `${page.title}?`);
-                    this.$set('modal.modalIsOpen', !this.modal.modalIsOpen);
-                    this.$set('modal.toRemove', [page]);
+
+                    let selected = this.pageData.filter(e => e.isSelected);
+
+                    if (selected.length > 1) {
+                        this.$set('modal.items', `${selected.length} items?`);
+                        this.$set('modal.modalIsOpen', !this.modal.modalIsOpen);
+                        this.$set('modal.toRemove', selected);
+                    } else {
+                        this.$set('modal.items', `${page.title}?`);
+                        this.$set('modal.modalIsOpen', !this.modal.modalIsOpen);
+                        this.$set('modal.toRemove', [page]);
+                    }
                 }
             },
             removePage(bool){
@@ -186,10 +203,11 @@
                 }
             },
             _deletePage(page){
-                axios.post('/aPanel/tasks/getData/pages/remove', {title: page.title, datePublished: page.datePublished})
+                axios.post('/aPanel/tasks/getData/pages/remove', {id: page._id})
                         .then(() => this.pageData.$remove(page))
                         .catch(err => console.log(err, 'error'));
             }
         }
+
     }
 </script>

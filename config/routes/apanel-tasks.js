@@ -30,12 +30,21 @@ router.post('/getData/siteStatus', (req, res) => {
     });
 });
 
-router.post('/getData/pages/add' , (req, res) => {
-   Page.addPage(req).then(response => res.json(response))
-});
 
-router.post('/getData/pages/remove' , (req, res) => {
-    Page.removePage(req).then(response => res.json(response))
+router.post('/getData/:type/:action', (req, res) => {
+    if (req.params.type === 'pages') {
+        switch(req.params.action) {
+            case 'add': Page.addPage(req).then(response => res.json(response));
+                break;
+            case 'edit': Page.editPage(req).then(response => res.json(response));
+                break;
+            case 'remove': Page.removePage(req).then(response => res.json(response));
+                break;
+            default: res.end('Wrong query');
+        }
+    } else {
+        res.end('Wrong query')
+    }
 });
 
 router.get('/getData/:type?/:id?', (req,res) => {

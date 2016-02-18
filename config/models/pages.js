@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 var bcrypt = require('../helpers/bcrypt');
 
 const pageSchema = mongoose.Schema({
-    title: {type: String, index: true},
+    title: String,
     datePublished: {type: Date, default: Date.now()},
     dateEdited: {type: Date, default: Date.now()},
     content: String,
@@ -42,16 +42,14 @@ const editPage = req => {
         var updateData = {
             title: req.body.title,
             dateEdited: Date.now(),
-            content: req.body.content,
-            by: req.body.by,
-            isActive: req.body.isActive
+            content: req.body.content
         };
 
-        Page.findOneAndUpdate({title: req.body.title,  datePublished: req.body.datePublished}, updateData, err => {
+        Page.findOneAndUpdate({_id: req.body.id}, updateData, {new: true}, (err, data) => {
             if(err) {
-              reject(err);
+                reject(err);
             } else {
-                resolve();
+                resolve(data);
             }
         });
     })
@@ -71,7 +69,7 @@ const changeStatus = req => {
 
 const removePage = req => {
     return new Promise(function (resolve, reject) {
-        Page.findOneAndRemove({title: req.body.title, datePublished: req.body.datePublished }, err => {
+        Page.findOneAndRemove({_id: req.body.id }, err => {
             if (err) {
                 reject(err);
             } else {

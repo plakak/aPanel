@@ -7,7 +7,7 @@
         position: relative;
         min-height: 50px;
         background-color: $backgrnd-color;
-        border: 1px solid $border-color;
+        border: 1px solid rgba($border-color,.5);
         border-top-left-radius: 4px;
         border-top-right-radius: 4px;
 
@@ -37,7 +37,6 @@
             background-color: rgba(#71aac2, 0.4);
 
         }
-
     }
 
     .indicator {
@@ -52,7 +51,7 @@
     }
 
     .buttons {
-        flex: 2;
+        flex: 1;
         display: flex;
         position: relative;
         justify-content: space-around;
@@ -67,6 +66,8 @@
         flex-basis: 100%;
         padding: 1rem;
         margin: 1rem;
+        box-shadow: 1px 1px 30px rgba(0,0,0,.2);
+        border: 1px solid rgba(0,0,0,.2);
         background-color: darken($backgrnd-color, 10%);
     }
 
@@ -83,22 +84,15 @@
         }
     }
 
-    textarea {
-        min-height: 200px;
-        max-width: 100%;
-        max-height: 200px;
-    }
-
-    input {
-        min-height: 50px;
-        min-width: 90%;
-    }
-
     .info {
+        display: flex;
+        flex-direction: column;
         align-self: flex-end;
+        align-items: flex-end;
     }
 
     .save-alert {
+        position: absolute;
         color: #d72822;
         font-weight: 700;
     }
@@ -108,38 +102,67 @@
         color: gray;
     }
 
-    .hide {
-        opacity: 0;
+    .cancel-button {
+        color: #d72822;
+        position: absolute;
+        left: -25px;
+        top: calc(100% - 32px)
     }
 
+    .save-button {
+        color: #71c271;
+        position: absolute;
+        left: -60px;
+        top: calc(100% - 32px)
+    }
 
 </style>
 
 <template>
-
         <div class="page_container" :class="details">
-            <div class="click-container"  @click="pageData.isSelected = !pageData.isSelected"></div>
-            <div class="page_heading" :class="{'page_heading--selected': pageData.isSelected}">
+            <div class="click-container"  @click="showDetails"></div>
+            <div class="page_heading" :class="{'page_heading--selected': externalData.isSelected}">
                 <span class="indicator" :style="activeColor"> </span>
-                <div class="content">{{pageData.title}}</div>
+
+                <div class="content">{{title}}</div>
+
                 <span class="buttons">
-                    <i class="glyphicon glyphicon glyphicon-ok save-button" :class="savedClass" @click='saveEdits'></i>
-                    <i class="glyphicon glyphicon glyphicon-remove cancel-button" :class="savedClass" @click='undoEdits'></i>
-                    <i class="glyphicon" :class="activeIcon" @click='changeVisibility'></i>
-                    <i class="glyphicon glyphicon-cog" @click='showDetails'></i>
-                    <i class="glyphicon glyphicon-trash" @click='removePage'></i>
+                    <i class="glyphicon glyphicon glyphicon-ok save-button"
+                       @click='saveEdits'
+                       v-show="!externalData.isSaved || externalData.isEdited">
+                    </i>
+                    <i class="glyphicon glyphicon glyphicon-remove cancel-button"
+                       @click='undoEdits'
+                       v-show="!externalData.isSaved || externalData.isEdited">
+                    </i>
+                    <i class="glyphicon glyphicon-check"
+                       @click='externalData.isSelected = !externalData.isSelected'>
+                    </i>
+                    <i class="glyphicon"
+                       :class="activeIcon"
+                       @click='changeVisibility'>
+                    </i>
+                    <i class="glyphicon glyphicon-trash"
+                       @click='removePage'>
+                    </i>
                 </span>
             </div>
+
             <div class="details">
-                <span class="save-alert" v-show="!pageData.isSaved">Warning - this site is not saved!</span>
+                <span class="save-alert" v-show="!externalData.isSaved || externalData.isEdited">
+                    Warning - this site is not saved!
+                </span>
+
                 <div class="info">
-                    <p>Addend on {{ pageData.datePublished }}</p>
-                    <p>Addend by</p>
+                    <p>Last edit on {{ formattedEditDate }}</p>
+                    <p>Added by {{ externalData.by }}</p>
                 </div>
+
                 <label for="title">Title</label>
-                <input type="text" name="title" id="title" v-model=pageData.title />
+                <input :class="formIndicatorsTitle" type="text" name="title" id="title" v-model="title" />
                 <label for="content">Content</label>
-                <textarea name="content" id="content" v-model="pageData.content"></textarea>
+                <textarea :class="formIndicatorsContent" name="content" id="content" v-model="content"></textarea>
+
             </div>
         </div>
 
@@ -148,34 +171,79 @@
 
 <script type="text/babel">
 
+    import moment from 'moment'
 
     export default {
-        props: ['pageData', 'showDetails', 'removePage', 'changeVisibility', 'saveEdits'],
+        props: ['externalData', 'showDetails', 'removePage', 'changeVisibility', 'saveData'],
+
         data() {
             return {
+                title: '',
+                content: ''
             }
+        },
+        compiled(){
+            this.$set('title', this.externalData.title);
+            this.$set('content', this.externalData.content);
         },
         computed: {
             activeColor() {
-                return this.pageData.isActive ? {backgroundColor: '#71c271'} : {backgroundColor: '#d5706b'};
+                return this.externalData.isActive ? {backgroundColor: '#71c271'} : {backgroundColor: '#d5706b'};
             },
             activeIcon() {
               return {
-                  'glyphicon-eye-open': !this.pageData.isActive,
-                  'glyphicon-eye-close': this.pageData.isActive,
-                  'lower-opacity': !this.pageData.isSaved
+                  'glyphicon-eye-open': !this.externalData.isActive,
+                  'glyphicon-eye-close': this.externalData.isActive,
+                  'lower-opacity': !this.externalData.isSaved
 
               }
             },
             details() {
                 return {
-                    'page_container--closed': !this.pageData.isDetails,
-                    'page_container--open': this.pageData.isDetails
+                    'page_container--closed': !this.externalData.isDetails,
+                    'page_container--open': this.externalData.isDetails
                 }
             },
-            savedClass(){
+            formIndicatorsTitle(){
+                  return {
+                      'form-inputs': true,
+                      'form-inputs--untouched': this.title === this.externalData.title && this.externalData.isSaved,
+                      'form-inputs--unsaved': this.title !== this.externalData.title
+                  }
+            },
+            formIndicatorsContent(){
                 return {
-                    'hide': this.pageData.isSaved
+                    'form-inputs': true,
+                    'form-inputs--untouched':  this.content === this.externalData.content && this.externalData.isSaved,
+                    'form-inputs--unsaved': this.content !== this.externalData.content
+                }
+            },
+            formattedEditDate(){
+                return moment(this.externalData.dateEdited).format('DD-MMM-YYYY HH:mm')
+            }
+        },
+        methods: {
+            undoEdits(){
+                this.$set('title', this.externalData.title);
+                this.$set('content', this.externalData.content);
+            },
+            saveEdits() {
+                this.saveData({title: this.title, content: this.content})
+            }
+        },
+        watch: {
+            'title'() {
+                if (this.content !== this.externalData.content || this.title !== this.externalData.title) {
+                    this.$set('externalData.isEdited', true);
+                } else {
+                    this.$set('externalData.isEdited', false);
+                }
+            },
+            'content'() {
+                if (this.content !== this.externalData.content || this.title !== this.externalData.title) {
+                    this.$set('externalData.isEdited', true);
+                } else {
+                    this.$set('externalData.isEdited', false);
                 }
             }
         }

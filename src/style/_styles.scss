@@ -16,7 +16,7 @@ html, body {
 }
 
 .color-bar-nav {
-  @include color-bar(#4988ab, "Navigation");
+  @include color-bar(#5683A3, "Navigation");
 }
 .color-bar-error {
   @include color-bar(#d72822, "Warning! Site is inactive!");
@@ -26,7 +26,7 @@ html, body {
 }
 
 .color-bar-pages {
-  @include color-bar(#4b4a3f, "Pages");
+  @include color-bar(#705346, "Pages");
 }
 
 body {
@@ -71,4 +71,38 @@ button {
 
 small {
   display: block;
+}
+
+
+.form-inputs {
+  background-color: darken(white, 5%);
+  border-radius: 4px;
+  border: 0;
+  padding-left: 10px;
+  padding-right: 10px;
+
+  &:focus {
+    background-color: white;
+    outline: none;
+  }
+
+  @at-root input {
+    min-height: 50px;
+    min-width: 90%;
+
+  }
+
+  @at-root textarea {
+    min-height: 200px;
+    max-width: 100%;
+    max-height: 200px;
+  }
+}
+
+.form-inputs--untouched {
+  border-bottom: 2px solid darken(white, 40%);
+}
+
+.form-inputs--unsaved {
+  border-bottom: 2px solid red;
 }
