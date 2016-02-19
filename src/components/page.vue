@@ -131,21 +131,26 @@
                 <span class="buttons">
                     <i class="glyphicon glyphicon glyphicon-ok save-button"
                        @click='saveEdits'
-                       v-show="!externalData.isSaved || externalData.isEdited">
+                       v-show="!externalData.isSaved || externalData.isEdited"
+                       title="Save edits">
                     </i>
                     <i class="glyphicon glyphicon glyphicon-remove cancel-button"
                        @click='undoEdits'
-                       v-show="!externalData.isSaved || externalData.isEdited">
+                       v-show="!externalData.isSaved || externalData.isEdited"
+                       title="Undo edits">
                     </i>
                     <i class="glyphicon glyphicon-check"
-                       @click='externalData.isSelected = !externalData.isSelected'>
+                       @click='externalData.isSelected = !externalData.isSelected'
+                       title="Select field">
                     </i>
                     <i class="glyphicon"
                        :class="activeIcon"
-                       @click='changeVisibility'>
+                       @click='changeVisibility'
+                       title="Change visibility">
                     </i>
                     <i class="glyphicon glyphicon-trash"
-                       @click='removePage'>
+                       @click='removePage'
+                       title="Remove">
                     </i>
                 </span>
             </div>

@@ -110,7 +110,7 @@
             }
         },
         beforeCompile() {
-            axios.get('/aPanel/tasks/getData/siteStatus/')
+            axios.get('/aPanel/tasks/siteStatus/')
                     .then(response => {
                         this.$set('siteActive',response.data.siteActive);
                         this.$set('offlineDescription', response.offlineDescription || "We'll be back soon!");
@@ -123,13 +123,13 @@
                 console.log(this.dismissed);
             },
             activateSite(){
-                axios.post('/aPanel/tasks/getData/siteStatus/', {siteActive: !this.siteActive})
+                axios.post('/aPanel/tasks/siteStatus/', {siteActive: !this.siteActive})
                     .then(response =>  this.$set('siteActive', !this.siteActive))
                     .catch(err => console.log(err));
             },
             //for testing
             killSite(){
-                axios.post('/aPanel/tasks/getData/siteStatus/', {siteActive: !this.siteActive})
+                axios.post('/aPanel/tasks/siteStatus/', {siteActive: !this.siteActive})
                         .then(response =>  this.$set('siteActive', !this.siteActive))
                         .catch(err => console.log(err));
             }

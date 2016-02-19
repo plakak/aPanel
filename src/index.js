@@ -15,7 +15,7 @@ Vue.use(VueRouter);
 export var router = new VueRouter();
 
 
-axios.get('/aPanel/tasks/getData/siteStatus')
+axios.get('/aPanel/tasks/siteStatus')
     .then(resp => {
 
         Vue.config.debug = true;

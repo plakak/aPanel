@@ -65,11 +65,9 @@
                 </div>
                 <div class="main-controls">
 
-
-                    <i class="glyphicon glyphicon-plus button" @click="addNewPage"></i>
-                    <i class="glyphicon glyphicon-duplicate button" @click="selectAll"></i>
-                    <i class="glyphicon glyphicon-cog button lower-opacity"></i>
-
+                    <i class="glyphicon glyphicon-plus button" @click="addNewPage" title="Add new page"></i>
+                    <i class="glyphicon glyphicon-duplicate button" @click="selectAll" title="Select all"></i>
+                    <i class="glyphicon glyphicon-cog button lower-opacity" title="Custom fields"></i>
 
                 </div>
             </div>
@@ -101,7 +99,7 @@
     export default {
         route: {
             data(transition) {
-                axios.get('/aPanel/tasks/getData/pages')
+                axios.get('/getData/pages')
                     .then(response => {
                         let pageData = response.data.map(e => {
                             return Object.assign({}, e,
@@ -121,13 +119,11 @@
         },
         data() {
             return {
-
                 modal: {
                     modalIsOpen: false,
                     items: '',
                     toRemove: []
                 },
-
                 pageData: []
             }
         },
@@ -135,14 +131,11 @@
             page,
             modal
         },
-
         methods: {
-
             addNewPage(){
                 this.$set('pageData',[
 
                     ...this.pageData,
-
                     {
                         title: '',
                         isSelected: false,
@@ -152,59 +145,49 @@
                         isEdited: false,
                         by: isLoggedIn.username
                     }
-
                 ]);
             },
 
             saveData(page, data){
                 if (!page.isSaved) {
-
-                    axios.post('/aPanel/tasks/getData/pages/add',
+                    axios.post('/aPanel/tasks/pages/add',
                             {
                                 title: data.title,
                                 content: data.content,
                                 by: isLoggedIn.username
                             })
-
                     .then((resp) => {
                         page.isSaved = true;
                         page.isEdited = false;
                         page.title = resp.data.title;
                         page.content = resp.data.content;
                     })
-
                     .catch(err => console.log(err, 'error'));
 
                 } else {
-
-                    axios.post('/aPanel/tasks/getData/pages/edit',
+                    axios.post('/aPanel/tasks/pages/edit',
                             {
                                 title: data.title,
                                 content: data.content,
                                 id: page._id
                             })
-
                             .then((resp) => {
                                 page.isEdited = false;
                                 page.title = resp.data.title;
                                 page.content = resp.data.content;
                                 page.dateEdited= moment.now();
                             })
-
                             .catch(err => console.log(err, 'error'));
                 }
             },
-
             showDetails(page){
                 if (page.isSelected) {
-
                     this.pageData.forEach(item => {
                         if (item.isSelected) {
                             item.isDetails = !item.isDetails;
                             item.isSelected = false;
                         }
                     });
-
                 } else {
                     page.isDetails = !page.isDetails;
 
@@ -223,8 +206,7 @@
             changeVisibility(page){
                 if (page.isSaved) {
                     page.isActive = !page.isActive;
-
-                    axios.post('/aPanel/tasks/getData/pages/changeStatus', {id: page._id, isActive: page.isActive})
+                    axios.post('/aPanel/tasks/pages/changeStatus', {id: page._id, isActive: page.isActive})
                         .catch(() => page.isActive =! page.isActive);
                 }
             },
@@ -232,7 +214,6 @@
             deleteHandler(page){
                 if(!page.isSaved) {
                     this.pageData.$remove(page);
-
                 } else {
                     let selected = this.pageData.filter(e => e.isSelected);
 
@@ -259,7 +240,7 @@
             },
 
             _deletePage(page){
-                axios.post('/aPanel/tasks/getData/pages/remove', {id: page._id})
+                axios.post('/aPanel/tasks/pages/remove', {id: page._id})
                         .then(() => this.pageData.$remove(page))
                         .catch(err => console.log(err, 'error'));
             }

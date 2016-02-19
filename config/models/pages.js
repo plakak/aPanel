@@ -1,5 +1,4 @@
 var mongoose = require('mongoose');
-var bcrypt = require('../helpers/bcrypt');
 
 const pageSchema = mongoose.Schema({
     title: String,
@@ -80,7 +79,7 @@ const removePage = req => {
     });
 };
 
-const returnPages = () => {
+const getPages = () => {
     return new Promise(function (resolve, reject) {
         Page.find().exec((err, data) => {
            if (err) {
@@ -92,17 +91,6 @@ const returnPages = () => {
     });
 };
 
-const returnPage = title => {
-    return new Promise(function (resolve, reject) {
-        Page.findOne({title: title}, (err, data) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(data);
-            }
-        });
-    });
-};
 
 module.exports = {
     Page,
@@ -110,8 +98,7 @@ module.exports = {
     editPage,
     chengeStatus,
     removePage,
-    returnPages,
-    returnPage
+    getPages
 };
 
 
