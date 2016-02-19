@@ -40,6 +40,11 @@
         padding: 20px;
     }
 
+    .lower-opacity {
+        opacity: 0.7;
+        color: gray;
+    }
+
 
 </style>
 
@@ -63,6 +68,7 @@
 
                     <i class="glyphicon glyphicon-plus button" @click="addNewPage"></i>
                     <i class="glyphicon glyphicon-duplicate button" @click="selectAll"></i>
+                    <i class="glyphicon glyphicon-cog button lower-opacity"></i>
 
 
                 </div>
@@ -76,8 +82,8 @@
             </div>
             <div class="modal-body" slot="modal-body">Are you sure you want to delete {{ modal.items }}</div>
             <div class="modal-footer" slot="modal-footer">
-                <button type="button" class="btn btn-default" @click="removePage(false)">Back</button>
-                <button type="button" class="btn btn-danger" @click="removePage(true)">Delete</button>
+                <button type="button" class="btn btn-default" @click="removePageConfirmation(false)">Back</button>
+                <button type="button" class="btn btn-danger" @click="removePageConfirmation(true)">Delete</button>
             </div>
 
         </modal>
@@ -94,26 +100,34 @@
 
     export default {
         route: {
-           data(transition) {
+            data(transition) {
                 axios.get('/aPanel/tasks/getData/pages')
-                        .then(response => {
-                            let pageData = response.data.map(e => {
-                                return Object.assign({}, e, {isDetails: false, isSelected: false, isSaved: true, isEdited: false});
-                            });
-                            transition.next({
-                                pageData
-                            });
+                    .then(response => {
+                        let pageData = response.data.map(e => {
+                            return Object.assign({}, e,
+                                    {
+                                        isDetails: false,
+                                        isSelected: false,
+                                        isSaved: true,
+                                        isEdited: false
+                                    });
                         });
+                        transition.next({
+                            pageData
+                        });
+                    });
             },
             waitForData: true
         },
         data() {
             return {
+
                 modal: {
                     modalIsOpen: false,
                     items: '',
                     toRemove: []
                 },
+
                 pageData: []
             }
         },
@@ -121,42 +135,76 @@
             page,
             modal
         },
+
         methods: {
+
             addNewPage(){
                 this.$set('pageData',[
+
                     ...this.pageData,
+
                     {
-                        title: '',  isSelected: false, isDetails: true, isSaved: false, isActive: false, isEdited: false
+                        title: '',
+                        isSelected: false,
+                        isDetails: true,
+                        isSaved: false,
+                        isActive: false,
+                        isEdited: false,
+                        by: isLoggedIn.username
                     }
 
                 ]);
             },
+
             saveData(page, data){
                 if (!page.isSaved) {
-                    axios.post('/aPanel/tasks/getData/pages/add', {title: data.title, content: data.content, by: isLoggedIn.username})
-                    .then(() => { page.isSaved = true; page.isEdited = false; })
+
+                    axios.post('/aPanel/tasks/getData/pages/add',
+                            {
+                                title: data.title,
+                                content: data.content,
+                                by: isLoggedIn.username
+                            })
+
+                    .then((resp) => {
+                        page.isSaved = true;
+                        page.isEdited = false;
+                        page.title = resp.data.title;
+                        page.content = resp.data.content;
+                    })
+
                     .catch(err => console.log(err, 'error'));
+
                 } else {
-                    axios.post('/aPanel/tasks/getData/pages/edit', {title: data.title, content: data.content, id: page._id})
+
+                    axios.post('/aPanel/tasks/getData/pages/edit',
+                            {
+                                title: data.title,
+                                content: data.content,
+                                id: page._id
+                            })
+
                             .then((resp) => {
-                                console.log(resp)
                                 page.isEdited = false;
                                 page.title = resp.data.title;
                                 page.content = resp.data.content;
                                 page.dateEdited= moment.now();
-
                             })
+
                             .catch(err => console.log(err, 'error'));
                 }
             },
+
             showDetails(page){
                 if (page.isSelected) {
+
                     this.pageData.forEach(item => {
                         if (item.isSelected) {
                             item.isDetails = !item.isDetails;
                             item.isSelected = false;
                         }
                     });
+
                 } else {
                     page.isDetails = !page.isDetails;
 
@@ -165,27 +213,34 @@
                     });
                 }
             },
+
             selectAll(){
                 this.pageData.forEach(item => {
                     item.isSelected =  !item.isSelected;
                 });
             },
+
             changeVisibility(page){
                 if (page.isSaved) {
                     page.isActive = !page.isActive;
+
+                    axios.post('/aPanel/tasks/getData/pages/changeStatus', {id: page._id, isActive: page.isActive})
+                        .catch(() => page.isActive =! page.isActive);
                 }
             },
+
             deleteHandler(page){
                 if(!page.isSaved) {
                     this.pageData.$remove(page);
-                } else {
 
+                } else {
                     let selected = this.pageData.filter(e => e.isSelected);
 
                     if (selected.length > 1) {
                         this.$set('modal.items', `${selected.length} items?`);
                         this.$set('modal.modalIsOpen', !this.modal.modalIsOpen);
                         this.$set('modal.toRemove', selected);
+
                     } else {
                         this.$set('modal.items', `${page.title}?`);
                         this.$set('modal.modalIsOpen', !this.modal.modalIsOpen);
@@ -193,7 +248,7 @@
                     }
                 }
             },
-            removePage(bool){
+            removePageConfirmation(bool){
                 if (!bool){
                     this.$set('modal.modalIsOpen', !this.modal.modalIsOpen);
                     this.$set('modal.toRemove', []);
@@ -202,6 +257,7 @@
                     this.$set('modal.modalIsOpen', !this.modal.modalIsOpen);
                 }
             },
+
             _deletePage(page){
                 axios.post('/aPanel/tasks/getData/pages/remove', {id: page._id})
                         .then(() => this.pageData.$remove(page))

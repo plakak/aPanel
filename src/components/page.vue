@@ -18,7 +18,7 @@
         }
 
         &--open {
-             height: 500px;
+             height: 800px;
              transition: height .3s ease-out;
              overflow: auto;
              overflow-y: hidden;
@@ -66,6 +66,8 @@
         flex-basis: 100%;
         padding: 1rem;
         margin: 1rem;
+        margin-top: 2rem;
+        padding-bottom: 2rem;
         box-shadow: 1px 1px 30px rgba(0,0,0,.2);
         border: 1px solid rgba(0,0,0,.2);
         background-color: darken($backgrnd-color, 10%);
@@ -154,14 +156,15 @@
                 </span>
 
                 <div class="info">
+                    <p>Published on {{ formattedPublishedDate }}</p>
                     <p>Last edit on {{ formattedEditDate }}</p>
                     <p>Added by {{ externalData.by }}</p>
                 </div>
 
                 <label for="title">Title</label>
-                <input :class="formIndicatorsTitle" type="text" name="title" id="title" v-model="title" />
+                <input :class="formIndicatorsTitle" type="text" name="title" id="title" v-model="title" placeholder="Your title" />
                 <label for="content">Content</label>
-                <textarea :class="formIndicatorsContent" name="content" id="content" v-model="content"></textarea>
+                <textarea :class="formIndicatorsContent" name="content" id="content" v-model="content" placeholder="Your content"></textarea>
 
             </div>
         </div>
@@ -208,18 +211,26 @@
                   return {
                       'form-inputs': true,
                       'form-inputs--untouched': this.title === this.externalData.title && this.externalData.isSaved,
-                      'form-inputs--unsaved': this.title !== this.externalData.title
+                      'form-inputs--unsaved': this.title !== this.externalData.title && this.externalData.isSaved ||
+                            !this.externalData.isSaved && !this.title,
+                      'form-inputs--valid': this.title && !this.externalData.isSaved
                   }
             },
             formIndicatorsContent(){
                 return {
                     'form-inputs': true,
-                    'form-inputs--untouched':  this.content === this.externalData.content && this.externalData.isSaved,
-                    'form-inputs--unsaved': this.content !== this.externalData.content
+                    'form-inputs--untouched': this.content === this.externalData.content && this.externalData.isSaved,
+                    'form-inputs--unsaved': this.content !== this.externalData.content && this.externalData.isSaved ||
+                         !this.externalData.isSaved && !this.content,
+                    'form-inputs--valid': this.content  && !this.externalData.isSaved
+
                 }
             },
             formattedEditDate(){
-                return moment(this.externalData.dateEdited).format('DD-MMM-YYYY HH:mm')
+                return moment(this.externalData.dateEdited).format('DD-MMM-YYYY HH:mm');
+            },
+            formattedPublishedDate(){
+                return moment(this.externalData.datePublished).format('DD-MMM-YYYY HH:mm');
             }
         },
         methods: {

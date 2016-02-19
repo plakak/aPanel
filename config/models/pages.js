@@ -55,9 +55,10 @@ const editPage = req => {
     })
 };
 
-const changeStatus = req => {
-    Page.findOneAndUpdate({title: req.body.title, datePublished: req.body.datePublished }, {isActive: req.body.isActive}, err => {
-        return new Promise(function (resolve, reject) {
+const chengeStatus = req => {
+    return new Promise(function (resolve, reject) {
+
+        Page.findOneAndUpdate({_id: req.body.id }, {isActive: req.body.isActive}, err => {
             if (err) {
                 reject(err);
             } else {
@@ -107,7 +108,7 @@ module.exports = {
     Page,
     addPage,
     editPage,
-    changeStatus,
+    chengeStatus,
     removePage,
     returnPages,
     returnPage

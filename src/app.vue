@@ -58,11 +58,11 @@
                     <div class="panel panel-default box-shadow">
                         <div class="panel-body color-bar-nav">
                             <ul class="nav nav-pills nav-stacked">
-                                <li><a v-link="'/posts'"> Pages </a></li>
+                                <li><a v-link="'/pages'"> Pages </a></li>
 
-                                <li><a href="#"> Posts </a></li>
+                                <li><a v-link="'/posts'"> Posts </a></li>
 
-                                <li><a href="#">Media</a></li>
+                                <li><a v-link="'/media'">Media</a></li>
                                 </ul>
 
                         </div>

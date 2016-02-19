@@ -40,6 +40,8 @@ router.post('/getData/:type/:action', (req, res) => {
                 break;
             case 'remove': Page.removePage(req).then(response => res.json(response));
                 break;
+            case 'changeStatus': Page.chengeStatus(req).then(response =>res.json(response));
+                break;
             default: res.end('Wrong query');
         }
     } else {
@@ -47,7 +49,7 @@ router.post('/getData/:type/:action', (req, res) => {
     }
 });
 
-router.get('/getData/:type?/:id?', (req,res) => {
+router.get('/getData/:type?/', (req,res) => {
 
     if(!req.params.type){
         res.status(404).end('No such type');
