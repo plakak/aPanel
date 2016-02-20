@@ -8,8 +8,10 @@ module.exports = function(app) {
     app.use('/aPanel/tasks', aPanelTasksRoutes);
     app.use('/aPanel', aPanelMainRoutes);
     app.use('/', publicRoutes);
-    app.use((req, res) => {
-        res.status(404).render('404.jade');
-    });
 
+    app.get('*', function(req, res, next) {
+        var err = new Error();
+        err.status = 404;
+        next(err);
+    });
 };

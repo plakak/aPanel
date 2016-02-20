@@ -38,6 +38,7 @@ db.once('open', function () {console.log('db connected')});
 require('./config/passport-config')(app);
 require('./config/routes.js')(app, express);
 
+require('./config/helpers/error-handler')(app);
 
 app.listen(port);
 

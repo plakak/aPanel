@@ -3,7 +3,7 @@ var Settings = require('../models/settings').Settings;
 var Page = require('../models/pages');
 var Media = require('../models/media');
 var Post = require('../models/posts');
-var upload = require('../helpers/file-handeler');
+var upload = require('../helpers/file-handler');
 var router = express.Router();
 
 const checkAuth = function(req,res,next) {
