@@ -8,6 +8,8 @@ import Pages from './views/pages.vue';
 import Posts from './views/posts.vue';
 import Media from './views/media.vue';
 
+import dropbox from './directives/file-dropbox';
+
 
 Vue.use(VueResource);
 Vue.use(VueRouter);
