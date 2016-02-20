@@ -29,11 +29,9 @@ const saveMediaReference = req => {
             relativePath: req.file.path.match(/[^public][^dist/].+/g),
             uploaded: Date.now(),
             uploadedBy: req.user.username,
-            category: req.body.category.split(','),
+            category: req.body.category.replace(/\W+/g, " ").split(' '),
             isActive: true
         };
-
-        console.log(newMediaEntry);
 
         var newMedia = new Media(newMediaEntry);
 

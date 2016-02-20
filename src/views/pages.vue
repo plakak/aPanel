@@ -60,6 +60,7 @@
                           :remove-page="deleteHandler.bind(null,page)"
                           :change-visibility="changeVisibility.bind(null, page)"
                           :save-data="saveData.bind(null, page)"
+                          :photo="false"
                     >
                     </page>
                 </div>

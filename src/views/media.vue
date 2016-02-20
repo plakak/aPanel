@@ -147,11 +147,9 @@
                 formData.append('category', 'one, two');
 
                 axios.post('/aPanel/tasks/media/add', formData)
-                        .then(resp => console.log(resp))
-                        .catch(err => console.log(err));
+                        .then(() => this.$broadcast('fileSent', true))
+                        .catch(() => this.$broadcast('fileSent', false));
             }
-
-
         }
     }
 </script>

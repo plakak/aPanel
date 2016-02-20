@@ -54,23 +54,20 @@
         <div class="panel panel-default box-shadow">
             <div class="panel-body color-bar-posts">
                 <div v-for="page in pageData | orderBy 'datePublished' -1">
-                    <!--<page class="page_space"-->
-                          <!--:external-data="page"-->
-                          <!--:show-details="showDetails.bind(null, page)"-->
-                          <!--:remove-page="deleteHandler.bind(null,page)"-->
-                          <!--:change-visibility="changeVisibility.bind(null, page)"-->
-                          <!--:save-data="saveData.bind(null, page)"-->
-                    <!--&gt;-->
-                    <!--</page>-->
+                    <page class="page_space"
+                          :external-data="page"
+                          :show-details="showDetails.bind(null, page)"
+                          :remove-page="deleteHandler.bind(null,page)"
+                          :change-visibility="changeVisibility.bind(null, page)"
+                          :save-data="saveData.bind(null, page)"
+                          :photo="true"
+                    >
+                    </page>
                 </div>
                 <div class="main-controls">
-
-
                     <i class="glyphicon glyphicon-plus button" @click="addNewPage"></i>
                     <i class="glyphicon glyphicon-duplicate button" @click="selectAll"></i>
                     <i class="glyphicon glyphicon-cog button lower-opacity"></i>
-
-
                 </div>
             </div>
         </div>

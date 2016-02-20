@@ -43,24 +43,30 @@ router.post('/siteStatus', (req, res) => {
  ########## */
 
 router.post('/:type/:action', upload.single('media'), (req, res) => {
-    if (req.params.type === 'pages') {
+
+
+    if (req.params.type  === 'pages' || req.params.type  ===  'posts') {
+        var type = (req.params.type  === 'pages') ? Page : Post;
+
         switch (req.params.action) {
             case 'add':
-                Page.addPage(req).then(response => res.json(response));
+                type.addPage(req).then(response => res.json(response));
                 break;
             case 'edit':
-                Page.editPage(req).then(response => res.json(response));
+                type.editPage(req).then(response => res.json(response));
                 break;
             case 'remove':
-                Page.removePage(req).then(response => res.json(response));
+                type.removePage(req).then(response => res.json(response));
                 break;
             case 'changeStatus':
-                Page.chengeStatus(req).then(response =>res.json(response));
+                type.chengeStatus(req).then(response =>res.json(response));
                 break;
             default:
                 res.end('Wrong query');
         }
+
     } else if (req.params.type === 'media'){
+
         switch (req.params.action) {
             case 'add':
                 Media.saveMediaReference(req).then(response => res.json(response));

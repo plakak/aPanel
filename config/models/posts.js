@@ -55,10 +55,24 @@ const getPosts = () => {
     });
 };
 
+const chengeStatus = req => {
+    return new Promise(function (resolve, reject) {
+
+        Post.findOneAndUpdate({_id: req.body.id }, {isActive: req.body.isActive}, err => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve();
+            }
+        });
+    });
+};
+
 module.exports = {
     Post,
     addPost,
-    getPosts
+    getPosts,
+    chengeStatus
 };
 
 

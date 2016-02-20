@@ -11,7 +11,7 @@ module.exports = (app) => {
         else if (err.code === 'LIMIT_FILE_SIZE') {
             // TODO: handle it properly
             console.log('FILE SIZE TOO LARGE');
-            res.end();
+            res.status(500).end('FILE SIZE TOO LARGE');
         }
         else {
             next();

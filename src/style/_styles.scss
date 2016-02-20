@@ -8,6 +8,7 @@ html, body {
   font-size: 16px;
   font-family: 'Lato', sans-serif;
   font-weight: 400;
+  overflow-y: scroll;
 }
 
 
@@ -79,7 +80,8 @@ small {
 
 
 .form-inputs {
-  background-color: darken(white, 7%);
+  background-color: rgba(220,220,220, 0.2);
+  //background-color: inherit;
   border-radius: 4px;
   border: 0;
   padding-left: 10px;
@@ -95,7 +97,7 @@ small {
     font-size: 1.2em;
     font-weight: 700;
     min-height: 50px;
-    min-width: 90%;
+    min-width: 100%;
 
   }
 
@@ -103,7 +105,7 @@ small {
     font-weight: 400;
     text-align: justify;
     overflow: hidden;
-    min-height: 380px;
+    min-height: 300px;
     max-width: 100%;
     max-height: 200px;
 
@@ -125,8 +127,3 @@ small {
   border-bottom: 4px solid #49e670;
 }
 
-label {
-  visibility: hidden;
-  font-weight: 700;
-  padding: .5em;
-}

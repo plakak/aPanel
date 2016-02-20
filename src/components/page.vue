@@ -6,6 +6,7 @@
     .page_container {
         position: relative;
         min-height: 50px;
+        max-height: 50px;
         background-color: $backgrnd-color;
         border: 1px solid rgba($border-color,.5);
         border-top-left-radius: 4px;
@@ -13,13 +14,19 @@
 
         &--closed {
              overflow: hidden;
-             height: 50px;
+             max-height: 50px;
              transition: all .3s ease-out;
         }
 
         &--open {
-             height: 800px;
-             transition: height .3s ease-out;
+             max-height: 650px;
+             transition: max-height .3s ease-out;
+             overflow: auto;
+             overflow-y: hidden;
+         }
+        &--open--images {
+             max-height: 1000px;
+             transition: max-height .3s ease-out;
              overflow: auto;
              overflow-y: hidden;
          }
@@ -66,11 +73,8 @@
         flex-basis: 100%;
         padding: 1rem;
         margin: 1rem;
-        margin-top: 2rem;
+        margin-top: 0;
         padding-bottom: 2rem;
-        box-shadow: 1px 1px 30px rgba(0,0,0,.2);
-        border: 1px solid rgba(0,0,0,.2);
-        background-color: darken($backgrnd-color, 10%);
     }
 
     .click-container{
@@ -88,9 +92,16 @@
 
     .info {
         display: flex;
-        flex-direction: column;
-        align-self: flex-end;
-        align-items: flex-end;
+        justify-content: space-around;
+
+        /*flex-direction: column;*/
+
+        p {
+           font-style: italic;
+           font-weight: 400;
+           font-size: 1.1em;
+           margin-bottom: 2em;
+        }
     }
 
     .save-alert {
@@ -117,6 +128,15 @@
         left: -60px;
         top: calc(100% - 32px)
     }
+
+    .page-label {
+        text-transform: uppercase;
+        text-align: center;
+        font-weight: 700;
+        margin-bottom: 0.9em;
+        font-size: 1.5em;
+    }
+
 
 </style>
 
@@ -161,15 +181,16 @@
                 </span>
 
                 <div class="info">
-                    <p>Published on {{ formattedPublishedDate }}</p>
-                    <p>Last edit on {{ formattedEditDate }}</p>
-                    <p>Added by {{ externalData.by }}</p>
+                    <p>Published: {{ formattedPublishedDate }}</p>
+                    <p>Edit: {{ formattedEditDate }}</p>
+                    <p>Added by: {{ externalData.by }}</p>
                 </div>
 
-                <label for="title">Title</label>
+                <label class="page-label" for="title">Title</label>
                 <input :class="formIndicatorsTitle" type="text" name="title" id="title" v-model="title" placeholder="Your title" />
-                <label for="content">Content</label>
+                <label class="page-label" for="content">Content</label>
                 <textarea :class="formIndicatorsContent" name="content" id="content" v-model="content" placeholder="Your content"></textarea>
+                <upload-file v-if="photo"></upload-file>
 
             </div>
         </div>
@@ -181,18 +202,24 @@
 
     import moment from 'moment'
 
+    import uploadFile from './uploadFile.vue'
+
     export default {
-        props: ['externalData', 'showDetails', 'removePage', 'changeVisibility', 'saveData'],
+        props: ['externalData', 'showDetails', 'removePage', 'changeVisibility', 'saveData', 'photo'],
 
         data() {
             return {
                 title: '',
-                content: ''
+                content: '',
+                photos: ''
             }
         },
         compiled(){
             this.$set('title', this.externalData.title);
             this.$set('content', this.externalData.content);
+        },
+        components: {
+          uploadFile
         },
         computed: {
             activeColor() {
@@ -203,13 +230,13 @@
                   'glyphicon-eye-open': !this.externalData.isActive,
                   'glyphicon-eye-close': this.externalData.isActive,
                   'lower-opacity': !this.externalData.isSaved
-
               }
             },
             details() {
                 return {
                     'page_container--closed': !this.externalData.isDetails,
-                    'page_container--open': this.externalData.isDetails
+                    'page_container--open': this.externalData.isDetails && !this.photo,
+                    'page_container--open--images': this.externalData.isDetails && this.photo
                 }
             },
             formIndicatorsTitle(){
