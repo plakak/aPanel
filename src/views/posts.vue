@@ -18,10 +18,10 @@
         display: flex;
         flex-direction: row;
 
-    p {
-        margin-top: auto;
-        padding-left: 1em;
-    }
+        p {
+            margin-top: auto;
+            padding-left: 1em;
+        }
     }
 
     .main-controls {
@@ -52,7 +52,7 @@
     <div>
 
         <div class="panel panel-default box-shadow">
-            <div class="panel-body color-bar-pages">
+            <div class="panel-body color-bar-posts">
                 <div v-for="page in pageData | orderBy 'datePublished' -1">
                     <!--<page class="page_space"-->
                           <!--:external-data="page"-->
@@ -101,7 +101,7 @@
     export default {
         route: {
             data(transition) {
-                axios.get('/getData/pages')
+                axios.get('/getData/posts')
                         .then(response => {
                             let pageData = response.data.map(e => {
                                 return Object.assign({}, e,
@@ -140,7 +140,6 @@
 
             addNewPage(){
                 this.$set('pageData',[
-
                     ...this.pageData,
 
                     {
@@ -158,8 +157,7 @@
 
             saveData(page, data){
                 if (!page.isSaved) {
-
-                    axios.post('/aPanel/tasks/pages/add',
+                    axios.post('/aPanel/tasks/posts/add',
                             {
                                 title: data.title,
                                 content: data.content,
@@ -176,8 +174,7 @@
                             .catch(err => console.log(err, 'error'));
 
                 } else {
-
-                    axios.post('/aPanel/tasks/pages/edit',
+                    axios.post('/aPanel/tasks/posts/edit',
                             {
                                 title: data.title,
                                 content: data.content,
@@ -197,14 +194,12 @@
 
             showDetails(page){
                 if (page.isSelected) {
-
                     this.pageData.forEach(item => {
                         if (item.isSelected) {
                             item.isDetails = !item.isDetails;
                             item.isSelected = false;
                         }
                     });
-
                 } else {
                     page.isDetails = !page.isDetails;
 
@@ -223,8 +218,7 @@
             changeVisibility(page){
                 if (page.isSaved) {
                     page.isActive = !page.isActive;
-
-                    axios.post('/aPanel/tasks/pages/changeStatus', {id: page._id, isActive: page.isActive})
+                    axios.post('/aPanel/tasks/posts/changeStatus', {id: page._id, isActive: page.isActive})
                             .catch(() => page.isActive =! page.isActive);
                 }
             },
@@ -232,7 +226,6 @@
             deleteHandler(page){
                 if(!page.isSaved) {
                     this.pageData.$remove(page);
-
                 } else {
                     let selected = this.pageData.filter(e => e.isSelected);
 
@@ -259,7 +252,7 @@
             },
 
             _deletePage(page){
-                axios.post('/aPanel/tasks/pages/remove', {id: page._id})
+                axios.post('/aPanel/tasks/posts/remove', {id: page._id})
                         .then(() => this.pageData.$remove(page))
                         .catch(err => console.log(err, 'error'));
             }

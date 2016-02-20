@@ -27,6 +27,10 @@
         }
     }
 
+    .button-on {
+        background-color: #71c271;
+    }
+
 </style>
 
 <template>
@@ -73,7 +77,7 @@
                     <div class="panel panel-default box-shadow" v-if="!siteActive && !dismissed">
                         <div class="panel-body color-bar-error">
                             <span class="close glyphicon glyphicon-remove" @click="hideWarning()"></span>
-                            <button class="btn btn-block btn-success" @click="activateSite()">"Turn site on"</button>
+                            <button class="btn btn-block btn-success button-on" @click="activateSite()">"Turn site on"</button>
                         </div>
                     </div>
                     <router-view></router-view>

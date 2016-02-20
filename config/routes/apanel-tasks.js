@@ -73,10 +73,4 @@ router.post('/:type/:action', upload.single('media'), (req, res) => {
     }
 });
 
-
-router.post('/testUpload/', upload.single('media'), (req,res) => {
-    res.json(req.file);
-});
-
-
 exports.router = router;
