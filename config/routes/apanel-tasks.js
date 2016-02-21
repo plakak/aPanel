@@ -42,7 +42,7 @@ router.post('/siteStatus', (req, res) => {
  ROUTES
  ########## */
 
-router.post('/:type/:action', upload.single('media'), (req, res) => {
+router.post('/:type/:action', upload.array('media'), (req, res) => {
 
 
     if (req.params.type  === 'pages' || req.params.type  ===  'posts') {
@@ -69,7 +69,13 @@ router.post('/:type/:action', upload.single('media'), (req, res) => {
 
         switch (req.params.action) {
             case 'add':
-                Media.saveMediaReference(req).then(response => res.json(response));
+                var promises =[];
+                req.files.forEach(file => {
+                    promises.push(Media.saveMediaReference(file, req));
+                });
+
+                Promise.all(promises).then(response => res.json(response));
+
                 break;
             default:
                 res.end('Wrong query');

@@ -31,6 +31,7 @@ var pageStatus = require('./config/helpers/page-status');
 app.use('/aPanel', express.static(__dirname + '/public/static/aPanel'));
 app.use('/', pageStatus, express.static(__dirname + '/public/dist'));
 app.use('/aPanel/style', express.static(__dirname + '/src/style/'));
+app.use('/uploads', express.static(__dirname + '/public/dist/uploads'));
 
 require('./config/routes.js')(app, express);
 

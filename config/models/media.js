@@ -18,18 +18,18 @@ const mediaSchema = mongoose.Schema({
 
 const Media = mongoose.model('Media', mediaSchema);
 
-const saveMediaReference = req => {
+const saveMediaReference = (file, req) => {
     return new Promise((resolve, reject) => {
 
         var newMediaEntry = {
-            originalname: req.file.originalname,
-            destination: req.file.destination,
-            filename: req.file.filename,
-            path: req.file.path,
-            relativePath: req.file.path.match(/[^public][^dist/].+/g),
+            originalname: file.originalname,
+            destination: file.destination,
+            filename: file.filename,
+            path: file.path,
+            relativePath: file.path.match(/[^public][^dist/].+/g),
             uploaded: Date.now(),
             uploadedBy: req.user.username,
-            category: req.body.category.replace(/\W+/g, " ").split(' '),
+            category: req.body.category ? req.body.category.replace(/\W+/g, " ").split(' ') : '',
             isActive: true
         };
 

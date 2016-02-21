@@ -55,6 +55,7 @@
         background-color: rgba(#2d0101,.2);
         display: block;
         width: 30em;
+        min-height: 5em;
         position: relative;
         margin: 1em auto 1em;
         border-radius: 4px;
@@ -62,6 +63,7 @@
         font-style: italic;
         color: #0f0f0f;
         padding: 5px;
+        white-space: pre-line;
     }
 
     .clear-selected-file {
@@ -77,13 +79,13 @@
     <p class="upload-title">FILE UPLOAD</p>
     <form enctype="multipart/form-data" method="POST">
 
-        <label class="filename" :style="sendIndicator" v-dropbox="file">
+        <label class="filename" :style="sendIndicator" v-dropbox="files">
             {{ fileName }}
             <i class="glyphicon glyphicon-remove-circle clear-selected-file" @click="clearSelected" v-show="file"></i>
         </label>
-        <label class="media-button--select" for="file" >Select file</label>
+        <label class="media-button--select" for="file" >Select files</label>
 
-        <input id="file" type="file" name="media" v-on:change="_onFileChange" />
+        <input id="file" type="file" name="media" v-on:change="_onFileChange" multiple />
         <label class="media-button--submit" @click="fileSubmit">Submit</label>
     </form>
 
@@ -96,17 +98,23 @@
         props: ['submitHandeler'],
         data() {
             return {
-                file: '',
+                files: '',
                 success: false,
                 failure: false
             }
         },
         computed: {
             fileName() {
-                if (!this.success && !this.failure)
-                    return this.file ? this.file[0].name : "Please select a file.";
-                else {
-                    return this.success ? 'File sent!' : "Oops! File didn't send. Check size (max 10MB) and try again.";
+                if (!this.success && !this.failure) {
+                    let names = '';
+                    for (let file in this.files) {
+                        if (this.files.hasOwnProperty(file)) {
+                            names += this.files[file].name + '\n';
+                        }
+                    }
+                    return this.files ? names : "Please select or drag a files.";
+                } else {
+                    return this.success ? 'Files sent!' : "Oops! Files didn't send. Check size (max 10MB) and try again.";
                 }
             },
             sendIndicator(){
@@ -121,26 +129,26 @@
         },
         methods: {
             _onFileChange(e) {
-                let file = e.target.files || e.dataTransfer.files;
-                this.$set('file', file);
+                let files = e.target.files || e.dataTransfer.files;
+                this.$set('files', files);
             },
 
             fileSubmit(){
-                if (this.file) {
-                    this.submitHandeler(this.file)
+                if (this.files) {
+                    this.submitHandeler(this.files)
                 }
             },
             clearSelected(){
-                this.$set('file', '');
+                this.$set('files', '');
             }
         },
         events: {
             'fileSent'(status){
                if (status) {
-                   this.$set('file', '');
+                   this.$set('files', '');
                    this.$set('success', true);
                } else {
-                   this.$set('file', '');
+                   this.$set('files', '');
                    this.$set('failure', true);
                }
 
