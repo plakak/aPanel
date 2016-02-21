@@ -106,6 +106,11 @@
 
     .save-alert {
         position: absolute;
+        top: 4.9em;
+        font-size: 1.25em;
+        width: 100%;
+        text-align: center;
+        left: 0;
         color: #d72822;
         font-weight: 700;
     }
@@ -190,7 +195,9 @@
                 <input :class="formIndicatorsTitle" type="text" name="title" id="title" v-model="title" placeholder="Your title" />
                 <label class="page-label" for="content">Content</label>
                 <textarea :class="formIndicatorsContent" name="content" id="content" v-model="content" placeholder="Your content"></textarea>
-                <upload-file v-if="photo"></upload-file>
+                <slot>
+
+                </slot>
 
             </div>
         </div>
@@ -202,24 +209,18 @@
 
     import moment from 'moment'
 
-    import uploadFile from './uploadFile.vue'
-
     export default {
         props: ['externalData', 'showDetails', 'removePage', 'changeVisibility', 'saveData', 'photo'],
 
         data() {
             return {
                 title: '',
-                content: '',
-                photos: ''
+                content: ''
             }
         },
         compiled(){
             this.$set('title', this.externalData.title);
             this.$set('content', this.externalData.content);
-        },
-        components: {
-          uploadFile
         },
         computed: {
             activeColor() {

@@ -62,6 +62,11 @@
                           :save-data="saveData.bind(null, page)"
                           :photo="true"
                     >
+                        <upload-file
+                                v-if="page.attachedImages.length <= 0"
+                                :submit-handeler="submitHandeler(page)"
+                        ></upload-file>
+                        <div v-else></div>
                     </page>
                 </div>
                 <div class="main-controls">
@@ -94,6 +99,7 @@
     import moment from 'moment'
 
     import page from '../components/page.vue'
+    import uploadFile from '../components/uploadFile.vue'
 
     export default {
         route: {
@@ -130,11 +136,11 @@
         },
         components: {
             page,
-            modal
+            modal,
+            uploadFile
         },
 
         methods: {
-
             addNewPage(){
                 this.$set('pageData',[
                     ...this.pageData,
@@ -252,6 +258,26 @@
                 axios.post('/aPanel/tasks/posts/remove', {id: page._id})
                         .then(() => this.pageData.$remove(page))
                         .catch(err => console.log(err, 'error'));
+            },
+
+            submitHandeler(page, files){
+                var formData = new FormData();
+
+                for (let file in files){
+                    if (files.hasOwnProperty(file)) {
+                        formData.append('media', files[file]);
+                    }
+                }
+
+                formData.append('category', 'posts');
+
+
+                axios.post('/aPanel/tasks/media/add', formData)
+                        .then((resp) => {
+                            //todo: edit-post route and re-fetch data here
+                            this.$broadcast('fileSent', true)
+                        })
+                        .catch(() => this.$broadcast('fileSent', false));
             }
         }
 

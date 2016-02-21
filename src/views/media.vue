@@ -19,10 +19,10 @@
         display: flex;
         flex-direction: row;
 
-    p {
-        margin-top: auto;
-        padding-left: 1em;
-    }
+        p {
+            margin-top: auto;
+            padding-left: 1em;
+        }
     }
 
     .main-controls {
@@ -46,6 +46,59 @@
         color: gray;
     }
 
+    img {
+        max-width: 100%;
+    }
+
+    .image-container{
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        justify-content: center;
+        /*lost-center: 100%;*/
+        /*height: 100%;*/
+        /*lost-utility: edit;*/
+    }
+
+    .test{
+        display: flex;
+        flex-direction: column;
+        border-radius: 4px;
+        flex-basis: calc(100% / 3 - 15px);
+        margin: 5px;
+        padding: 5px;
+        align-items: center;
+        justify-content: center;
+        background-color: #00b3ee;
+
+    }
+    .image{
+        flex: 2;
+        display: flex;
+        align-items: center;
+        vertical-align: bottom;
+
+    }
+
+    .description {
+        flex: 1;
+        background-color: lighten(#00b3ee,20%);
+        display: flex;
+        word-break: break-all;
+        align-self: stretch;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 10px;
+    }
+
+
+    .scroll-container {
+        padding: 20px;
+        height: 35em;
+        overflow-y: scroll;
+    }
+
 
 </style>
 
@@ -54,17 +107,22 @@
 
         <div class="panel panel-default box-shadow">
             <div class="panel-body color-bar-pages">
-                <!--<div v-for="image in mediaData | orderBy 'uploaded' -1">-->
-                    <!--<media-file-->
-                          <!--:external-data="image"-->
-                    <!--&gt;-->
-                    <!--</media-file>-->
-                <!--</div>-->
-
-               <upload-file
-                :submit-handeler="submitHandeler"
-               >
-               </upload-file>
+                <div class="scroll-container">
+                    <div class="image-container">
+                        <div class="test" v-for="image in mediaData | orderBy 'uploaded' -1">
+                            <div class="image">
+                                <img :src="image.relativePath"/>
+                            </div>
+                            <div class="description">
+                                {{ image.originalname }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <upload-file
+                        :submit-handeler="submitHandeler"
+                >
+                </upload-file>
 
 
                 <div class="main-controls">
@@ -113,7 +171,6 @@
                                         {
                                             isDetails: false,
                                             isSelected: false,
-                                            isSaved: true,
                                             isEdited: false
                                         });
                             });
@@ -139,16 +196,36 @@
             uploadFile,
             modal
         },
-
+        //todo: if category posts = used in posts
         methods: {
-            submitHandeler(file){
+            submitHandeler(files){
                 var formData = new FormData();
-                formData.append('media', file[0]);
-                formData.append('category', 'one, two');
+
+                for (let file in files){
+                    if (files.hasOwnProperty(file)) {
+                        formData.append('media', files[file]);
+                    }
+                }
 
                 axios.post('/aPanel/tasks/media/add', formData)
-                        .then(() => this.$broadcast('fileSent', true))
-                        .catch(() => this.$broadcast('fileSent', false));
+                    .then((resp) => {
+
+                        let newEntries = resp.data.map(item => {
+                            return Object.assign({}, item, {
+                                isDetails: false,
+                                isSelected: false,
+                                isEdited: false
+                            });
+                        });
+
+                        this.mediaData = this.mediaData = [
+                            ...newEntries,
+                            ...this.mediaData
+                        ];
+
+                        this.$broadcast('fileSent', true)
+                    })
+                    .catch(() => this.$broadcast('fileSent', false));
             }
         }
     }
