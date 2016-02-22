@@ -45,124 +45,123 @@
         opacity: 0.7;
         color: gray;
     }
-
-    img {
-        max-width: 100%;
-    }
-
-    .image-container{
-        display: flex;
-        flex-wrap: wrap;
-        align-items: flex-start;
-        justify-content: center;
-        /*lost-center: 100%;*/
-        /*height: 100%;*/
-        /*lost-utility: edit;*/
-    }
-
-    .item {
-        display: flex;
-        position: relative;
-        flex-direction: column;
-        border-radius: 4px;
-        flex-basis: calc(100% / 3 - 15px);
-        margin: 5px;
-        padding: 5px;
-        align-items: center;
-        justify-content: center;
-        background-color: #00b3ee;
-    }
-
-    .remove-button {
-        position: absolute;
-        top: -10px;
-        right: -5px;
-        cursor: pointer;
-        font-weight: 700;
-        font-size: 1.3em;
-    }
-
-    .image{
-        flex: 2;
-        display: flex;
-        align-items: center;
-        vertical-align: bottom;
-
-    }
-
-    .description {
+    .categories {
         flex: 1;
-        background-color: lighten(#00b3ee,20%);
-        display: flex;
-        word-break: break-all;
-        align-self: stretch;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        padding: 10px;
+        flex-basis: 100%;
+
+        ul {
+            background-color: rgba(220,220,220, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            list-style: none;
+            padding: 1em;
+            margin-top: 1em;
+            flex-wrap: wrap;
+        }
+        li {
+            background-color: slategray;
+            color: white;
+            padding: 5px 10px;
+            margin-bottom: 5px;
+            margin-right: 2px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .active {
+            background-color: green;
+        }
     }
 
+    .cat-list {
+        display: flex;
+        flex: 5;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
 
-    .scroll-container {
-        padding: 20px;
-        height: 35em;
-        overflow-y: scroll;
+    .categories-controls {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        margin-left: 20px;
+        align-self: stretch;
+        i {
+            padding-bottom: 10px;
+            align-self: flex-end;
+        }
     }
 
 
 </style>
 
 <template>
-    <div>
-
-        <div class="panel panel-default box-shadow">
-            <div class="panel-body color-bar-pages">
-                <div class="scroll-container">
-                    <div class="image-container">
-                        <div class="item" v-for="image in mediaData | orderBy 'uploaded' -1">
-                            <span class="remove-button" @click="_deleteItem(image)">X</span>
-                            <div class="image">
-                                <img :src="image.relativePath"/>
-                            </div>
-                            <div class="description">
-                                {{ image.originalname }}
-                            </div>
-                          <div v-if="image.category.indexOf('posts') !== -1">
-                              Warning, used in posts.
-                          </div>
-                        </div>
+    <div class="panel panel-default box-shadow">
+        <div class="panel-body color-bar-pages">
+            <div class="categories">
+                <ul>
+                    <div class="cat-list">
+                    <li @click="selectedCategory = ''" :class="{'active': !selectedCategory}">All</li>
+                    <li v-for="category in categories" :class="{'active': category === selectedCategory}">
+                        <span @click="selectedCategory = category">{{ category }}</span>
+                    </li>
                     </div>
-                </div>
+                    <div class="categories-controls">
+                    <i class="glyphicon glyphicon-plus button" @click="modalAddCategory = !modalAddCategory"></i>
+                        <i class="glyphicon glyphicon-trash button" @click="deleteCategory"></i>
+                    </div>
+                </ul>
+
+            </div>
+                <media-files
+                    :external-data="mediaData"
+                    :selected-category="selectedCategory"
+                    :post-data="postData"
+                    :delete-item="_deleteItem"
+                ></media-files>
+            <div class="space"></div>
                 <upload-file
                         :submit-handeler="submitHandeler"
                 >
                 </upload-file>
 
-
                 <div class="main-controls">
-
-
-                    <!--<i class="glyphicon glyphicon-plus button" @click="addNewPage"></i>-->
-                    <!--<i class="glyphicon glyphicon-duplicate button" @click="selectAll"></i>-->
-                    <!--<i class="glyphicon glyphicon-cog button lower-opacity"></i>-->
-
 
                 </div>
             </div>
         </div>
-        <modal :show.sync="modal.modalIsOpen" effect="fade" :width="400">
+
+
+    <!-- MODALS -->
+
+
+        <modal :show.sync="deleteModal.modalIsOpen" effect="fade" :width="400">
             <div slot="modal-header">
                 <h4 class="modal-title">
                     <strong>Delete confirmation</strong>
                 </h4>
             </div>
-            <div class="modal-body" slot="modal-body">Are you sure you want to delete {{ modal.items }}</div>
+            <div class="modal-body" slot="modal-body">Are you sure you want to delete {{ deleteModal.items }}</div>
             <div class="modal-footer" slot="modal-footer">
                 <button type="button" class="btn btn-default" @click="removePageConfirmation(false)">Back</button>
                 <button type="button" class="btn btn-danger" @click="removePageConfirmation(true)">Delete</button>
             </div>
-
         </modal>
+    <modal :show.sync="modalAddCategory" effect="fade" :width="400">
+        <div slot="modal-header">
+            <h4 class="modal-title">
+                <strong>Add new category</strong>
+            </h4>
+        </div>
+        <div class="modal-body" slot="modal-body"><input v-model="newCategory"></div>
+        <div class="modal-footer" slot="modal-footer">
+            <button type="button" class="btn btn-default" @click="modalAddCategory = !modalAddCategory">Back</button>
+            <button type="button" class="btn btn-success" @click="addCategory(newCategory)">Add</button>
+        </div>
+    </modal>
+
+    <!-- ENDMODALS -->
+
     </div>
 </template>
 
@@ -172,15 +171,16 @@
     import { modal } from 'vue-strap';
     import moment from 'moment'
 
-    import mediaFile from '../components/mediaFile.vue'
+    import mediaFiles from '../components/mediaFiles.vue'
     import uploadFile from '../components/uploadFile.vue'
 
     export default {
         route: {
             data(transition) {
-                axios.get('/getData/media')
+                const promises = [
+                    axios.get('/getData/media')
                         .then(response => {
-                            let mediaData = response.data.map(e => {
+                            return response.data.map(e => {
                                 return Object.assign({}, e,
                                         {
                                             isDetails: false,
@@ -188,29 +188,84 @@
                                             isEdited: false
                                         });
                             });
-                            transition.next({
-                                mediaData
-                            });
-                        });
+                        }),
+                    axios.get('/aPanel/tasks/siteStatus')
+                        .then(response => {
+                            return response.data.categories
+                        }),
+                    axios.get('/getData/posts')
+                            .then(response => {
+                                return response.data
+                            })
+                ];
+
+                Promise.all(promises).then(response => {
+                    transition.next({
+                        mediaData: response[0],
+                        categories: response[1],
+                        postData: response[2]
+                    });
+                });
             },
             waitForData: true
         },
+        components: {
+            mediaFiles,
+            uploadFile,
+            modal
+        },
         data() {
             return {
-                modal: {
+                deleteModal: {
                     modalIsOpen: false,
                     items: '',
                     toRemove: []
                 },
-                mediaData: []
+                modalAddCategory: false,
+                mediaData: [],
+                categories: [],
+                postData: [],
+                selectedCategory: ''
             }
         },
-        components: {
-            mediaFile,
-            uploadFile,
-            modal
-        },
         methods: {
+            addCategory(name) {
+                axios.post('/aPanel/tasks/media/addCategory', {category: name})
+                    .then(response => {
+                        this.$set('modalAddCategory', false);
+                        this.$set('categories', response.data.categories);
+                    })
+                    .catch(err => console.log(err));
+
+            },
+            deleteCategory() {
+                let category = this.selectedCategory;
+                let promises = [];
+
+                if (category) {
+                    this.mediaData.forEach(image => {
+                        if (image.category) {
+                            if (image.category.indexOf(category) !== -1) {
+                                let index = image.category.indexOf(category);
+                                let tmpItems = [...image.category.slice(0, index), ...image.category.slice(index + 1)];
+                                promises.push(
+                                        axios.post('/aPanel/tasks/media/edit', {id: image._id, category: tmpItems})
+                                                .catch(err => console.log(err, 'error'))
+                                )
+                            }
+                        }
+                    });
+
+                    promises.push(axios.post('/aPanel/tasks/media/removeCategory', {category: category})
+                            .then(() => this.categories.$remove(category))
+                            .catch(err => console.log(err, 'error')));
+
+                    Promise.all(promises)
+                            .catch(err => console.log(err));
+                }
+            },
+            //todo: edit categories and edit media in general (+ adding categories before uploading)
+
             submitHandeler(files){
                 var formData = new FormData();
 
@@ -240,11 +295,38 @@
                     })
                     .catch(() => this.$broadcast('fileSent', false));
             },
+
             _deleteItem(item){
-                // todo: remove reference from posts that were attaching this image
-                axios.post('/aPanel/tasks/media/remove', {id: item._id})
-                        .then(() => this.mediaData.$remove(item))
-                        .catch(err => console.log(err, 'error'));
+
+                let promises = [];
+
+                this.postData.forEach(next => {
+                    if (next.attachedImages) {
+                        next.attachedImages.forEach(e => {
+                            if (e._id === item._id) {
+                                //todo: add alert that this image is used in a post
+                                let index = next.attachedImages.indexOf(e);
+                                let tmpItems = [...next.attachedImages.slice(0, index), ...next.attachedImages.slice(index + 1)];
+
+                                promises.push(
+                                    axios.post('/aPanel/tasks/posts/edit', {attachedImages: tmpItems})
+                                        .catch(err => console.log(err, 'error')),
+                                    axios.post('/aPanel/tasks/media/remove', {id: item._id})
+                                            .then(() => this.mediaData.$remove(item))
+                                            .catch(err => console.log(err, 'error'))
+                                )
+                            } else {
+                                axios.post('/aPanel/tasks/media/remove', {id: item._id})
+                                    .then(() => this.mediaData.$remove(item))
+                                    .catch(err => console.log(err, 'error'));
+                            }
+                        });
+                    }
+                });
+
+                Promise.all(promises)
+                    .catch(err => console.log(err));
+
             }
         }
     }

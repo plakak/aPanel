@@ -62,10 +62,6 @@
                           :save-data="saveData.bind(null, page)"
                           :photo="true"
                     >
-                        <upload-file
-                                v-if="!page.attachedImages || page.attachedImages.length <= 0 && !page.attachedImages[0]"
-                                :submit-handeler="submitHandeler.bind(this, page)"
-                        ></upload-file>
                         <div v-else v-for="image in page.attachedImages">
                             <img :src="image.relativePath">
                         </div>
@@ -101,26 +97,44 @@
     import moment from 'moment'
 
     import page from '../components/page.vue'
-    import uploadFile from '../components/uploadFile.vue'
+    import mediaFiles from '../components/mediaFiles.vue'
 
     export default {
         route: {
             data(transition) {
+
+                const promises = [
                 axios.get('/getData/posts')
+                    .then(response => {
+                        return response.data.map(e => {
+                            return Object.assign({}, e,
+                                {
+                                    isDetails: false,
+                                    isSelected: false,
+                                    isSaved: true,
+                                    isEdited: false
+                                });
+                        })
+                    }),
+                axios.get('/getData/media')
                         .then(response => {
-                            let pageData = response.data.map(e => {
-                                return Object.assign({}, e,
-                                        {
-                                            isDetails: false,
-                                            isSelected: false,
-                                            isSaved: true,
-                                            isEdited: false
-                                        });
-                            });
-                            transition.next({
-                                pageData
-                            });
+                            return response.data.map(e => {
+                            return Object.assign({}, e,
+                                {
+                                    isDetails: false,
+                                    isSelected: false,
+                                    isSaved: true,
+                                    isEdited: false
+                                });
+                            })
+                        })];
+                Promise.all(promises).then(response => {
+
+                        transition.next({
+                            pageData: response[0],
+                            mediaData: response[1]
                         });
+                    });
             },
             waitForData: true
         },
@@ -132,19 +146,19 @@
                     items: '',
                     toRemove: []
                 },
-
-                pageData: []
+                pageData: [],
+                mediaData: []
             }
         },
         components: {
             page,
             modal,
-            uploadFile
+            mediaFiles
         },
 
         methods: {
             addNewPage(){
-                this.$set('pageData',[
+                this.$set('pageData', [
                     ...this.pageData,
 
                     {
@@ -190,7 +204,7 @@
                                 page.isEdited = false;
                                 page.title = resp.data.title;
                                 page.content = resp.data.content;
-                                page.dateEdited= moment.now();
+                                page.dateEdited = moment.now();
                             })
 
                             .catch(err => console.log(err, 'error'));
@@ -216,7 +230,7 @@
 
             selectAll(){
                 this.pageData.forEach(item => {
-                    item.isSelected =  !item.isSelected;
+                    item.isSelected = !item.isSelected;
                 });
             },
 
@@ -224,12 +238,12 @@
                 if (page.isSaved) {
                     page.isActive = !page.isActive;
                     axios.post('/aPanel/tasks/posts/changeStatus', {id: page._id, isActive: page.isActive})
-                            .catch(() => page.isActive =! page.isActive);
+                            .catch(() => page.isActive = !page.isActive);
                 }
             },
 
             deleteHandler(page){
-                if(!page.isSaved) {
+                if (!page.isSaved) {
                     this.pageData.$remove(page);
                 } else {
                     let selected = this.pageData.filter(e => e.isSelected);
@@ -247,7 +261,7 @@
                 }
             },
             removePageConfirmation(bool){
-                if (!bool){
+                if (!bool) {
                     this.$set('modal.modalIsOpen', !this.modal.modalIsOpen);
                     this.$set('modal.toRemove', []);
                 } else {
@@ -260,40 +274,8 @@
                 axios.post('/aPanel/tasks/posts/remove', {id: page._id})
                         .then(() => this.pageData.$remove(page))
                         .catch(err => console.log(err, 'error'));
-            },
-
-            submitHandeler(page, files){
-                var formData = new FormData();
-
-                for (let file in files){
-                    if (files.hasOwnProperty(file)) {
-                        formData.append('media', files[file]);
-                    }
-                }
-
-                formData.append('category', 'posts');
-
-
-                axios.post('/aPanel/tasks/media/add', formData)
-                        .then((resp) => {
-                            let images = resp.data.map(e => e._id);
-
-                            axios.post('/aPanel/tasks/posts/edit', {_id: page._id,
-                                title: page.title,
-                                content: page.content,
-                                attachedImages: [images]
-                            })
-                                .then(output => {
-                                    page.isEdited = false;
-                                    page.title = output.data.title;
-                                    page.content = output.data.content;
-                                    page.attachedImages = output.data.attachedImages;
-                                    page.dateEdited= moment.now();
-                                });
-                            this.$broadcast('fileSent', true)
-                        })
-                        .catch(() => this.$broadcast('fileSent', false));
             }
+
         }
 
     }

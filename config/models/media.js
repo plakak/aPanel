@@ -46,10 +46,76 @@ const saveMediaReference = (file, req) => {
     });
 };
 
+
+const editMedia = (req) => {
+    return new Promise((resolve, reject) => {
+        var updateMedia;
+
+        if (req.body.originalname) {
+            updateMedia = {
+                originalname: req.body.originalname,
+                category: req.body.category ? req.body.category.replace(/\W+/g, " ").split(' ') : ''
+            };
+        } else {
+            updateMedia = {category: req.body.category};
+        }
+
+        Media.findOneAndUpdate({_id: req.body.id}, updateMedia, {new : true}, (err, model) => {
+            if (!err) {
+                resolve(model);
+            } else {
+                reject(err);
+            }
+        });
+    });
+};
+
+//todo: move categories into settings model
+
+const addCategory = req => {
+    return new Promise(function (resolve, reject) {
+
+        var category = req.body.category;
+
+        Settings.findOneAndUpdate({},{$push: {"categories": category}}, {safe: true, new : true}, (err, model) => {
+
+            if (!err) {
+                resolve(model);
+            } else {
+                reject(err);
+            }
+        });
+    });
+};
+
+const removeCategory = req => {
+    return new Promise(function (resolve, reject) {
+
+        Settings.findOne((err, data) => {
+
+            var index = data.categories.indexOf(req.body.category);
+            var newData = data.categories.slice(0, index).concat(data.categories.slice(index +1));
+
+        data.update(newData)
+            .then(resolve())
+            .catch(reject(err => console.log(err)));
+
+        });
+    });
+};
+
+
 const editCategory = req => {
     return new Promise(function (resolve, reject) {
 
-    })
+        Settings.findOneAndUpdate({_id: req.body.id},{categories: req.body.categories}, {new : true}, (err, model) => {
+            if (!err) {
+                resolve(model);
+            } else {
+                reject(err);
+            }
+        });
+    });
 };
 
 const chengeStatus = req => {
@@ -122,8 +188,11 @@ const getCategory = (category) => {
 
 module.exports = {
     Media,
+    editMedia,
     saveMediaReference,
+    addCategory,
     editCategory,
+    removeCategory,
     chengeStatus,
     removeMedia,
     changeFileName,

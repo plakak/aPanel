@@ -44,12 +44,20 @@ const addPost = req => {
 const editPost = req => {
     return new Promise((resolve, reject) => {
 
-        var editPostData = {
-            title: req.body.title,
-            content: req.body.content,
-            dateEdited: Date.now(),
-            attachedImages: [req.body.attachedImages]
-        };
+        var editPostData;
+
+        if (req.body.title) {
+
+            editPostData = {
+                title: req.body.title,
+                content: req.body.content,
+                dateEdited: Date.now(),
+                attachedImages: [req.body.attachedImages]
+            };
+
+        } else {
+            editPostData = {attachedImages: [req.body.attachedImages]};
+        }
 
         Post.findOneAndUpdate({_id: req.body._id}, editPostData, (err, data) => {
             if (err) {

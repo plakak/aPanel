@@ -77,9 +77,24 @@ router.post('/:type/:action', upload.array('media'), (req, res) => {
                 Promise.all(promises).then(response => res.json(response));
 
                 break;
+            case 'edit':
+                Media.editMedia(req)
+                    .then(response => res.json(response))
+                    .catch(err => res.json(err));
+                break;
             case 'remove':
                 Media.removeMedia(req)
                     .then(response => res.json(response))
+                    .catch(err => res.json(err));
+                break;
+            case 'addCategory':
+                Media.addCategory(req)
+                    .then(resposne => res.json(resposne))
+                    .catch(err => res.json(err));
+                break;
+            case 'removeCategory':
+                Media.removeCategory(req)
+                    .then(resposne => res.json(resposne))
                     .catch(err => res.json(err));
                 break;
             default:
