@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var Settings = require('../models/settings').Settings;
+var fs = require('fs');
 
 
 const mediaSchema = mongoose.Schema({
@@ -69,12 +70,28 @@ const changeFileName = req => {
 };
 
 const removeMedia = req => {
+
+    const removeFile = (path) => {
+        return new Promise((resolve, reject) => {
+            fs.unlink(path, (err, data) => {
+                if (err) {
+                    reject(err)
+                } else {
+                    console.log(data);
+                    resolve(data);
+                }
+            });
+        });
+    };
+
     return new Promise(function (resolve, reject) {
-        Media.findOneAndRemove({_id: req.body.id }, err => {
+        Media.findOneAndRemove({_id: req.body.id }, (err, data) => {
             if (err) {
                 reject(err);
             } else {
-                resolve();
+                removeFile(data.path)
+                .then( ()=> resolve() )
+                .catch( err => console.log(err) );
             }
         });
     });
@@ -92,6 +109,17 @@ const getMedia = () => {
     });
 };
 
+const getCategory = (category) => {
+    return new Promise(function (resolve, reject) {
+        Media.find({category}, (err, data) => {
+            if(!err) {
+                resolve(data)
+            }
+            else reject(err);
+        });
+    });
+};
+
 module.exports = {
     Media,
     saveMediaReference,
@@ -99,7 +127,8 @@ module.exports = {
     chengeStatus,
     removeMedia,
     changeFileName,
-    getMedia
+    getMedia,
+    getCategory
 };
 
 

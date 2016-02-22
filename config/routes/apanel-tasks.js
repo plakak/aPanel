@@ -50,13 +50,13 @@ router.post('/:type/:action', upload.array('media'), (req, res) => {
 
         switch (req.params.action) {
             case 'add':
-                type.addPage(req).then(response => res.json(response));
+                type.add(req).then(response => res.json(response));
                 break;
             case 'edit':
-                type.editPage(req).then(response => res.json(response));
+                type.edit(req).then(response => res.json(response));
                 break;
             case 'remove':
-                type.removePage(req).then(response => res.json(response));
+                type.remove(req).then(response => res.json(response));
                 break;
             case 'changeStatus':
                 type.chengeStatus(req).then(response =>res.json(response));
@@ -76,6 +76,11 @@ router.post('/:type/:action', upload.array('media'), (req, res) => {
 
                 Promise.all(promises).then(response => res.json(response));
 
+                break;
+            case 'remove':
+                Media.removeMedia(req)
+                    .then(response => res.json(response))
+                    .catch(err => res.json(err));
                 break;
             default:
                 res.end('Wrong query');

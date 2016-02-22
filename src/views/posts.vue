@@ -63,10 +63,12 @@
                           :photo="true"
                     >
                         <upload-file
-                                v-if="page.attachedImages.length <= 0"
-                                :submit-handeler="submitHandeler(page)"
+                                v-if="!page.attachedImages || page.attachedImages.length <= 0 && !page.attachedImages[0]"
+                                :submit-handeler="submitHandeler.bind(this, page)"
                         ></upload-file>
-                        <div v-else></div>
+                        <div v-else v-for="image in page.attachedImages">
+                            <img :src="image.relativePath">
+                        </div>
                     </page>
                 </div>
                 <div class="main-controls">
@@ -274,7 +276,20 @@
 
                 axios.post('/aPanel/tasks/media/add', formData)
                         .then((resp) => {
-                            //todo: edit-post route and re-fetch data here
+                            let images = resp.data.map(e => e._id);
+
+                            axios.post('/aPanel/tasks/posts/edit', {_id: page._id,
+                                title: page.title,
+                                content: page.content,
+                                attachedImages: [images]
+                            })
+                                .then(output => {
+                                    page.isEdited = false;
+                                    page.title = output.data.title;
+                                    page.content = output.data.content;
+                                    page.attachedImages = output.data.attachedImages;
+                                    page.dateEdited= moment.now();
+                                });
                             this.$broadcast('fileSent', true)
                         })
                         .catch(() => this.$broadcast('fileSent', false));

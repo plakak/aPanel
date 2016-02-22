@@ -94,10 +94,10 @@ const getPages = () => {
 
 module.exports = {
     Page,
-    addPage,
-    editPage,
+    add: addPage,
+    edit: editPage,
     chengeStatus,
-    removePage,
+    remove: removePage,
     getPages
 };
 

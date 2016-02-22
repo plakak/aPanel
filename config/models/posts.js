@@ -25,7 +25,7 @@ const addPost = req => {
             dateEdited: Date.now(),
             by: req.body.by,
             isActive: false,
-            attachedImages: [req.body.media_ids]
+            attachedImages: [req.body.attachedImages]
         };
 
         var newPost = new Post(newPostData);
@@ -41,6 +41,28 @@ const addPost = req => {
 };
 
 
+const editPost = req => {
+    return new Promise((resolve, reject) => {
+
+        var editPostData = {
+            title: req.body.title,
+            content: req.body.content,
+            dateEdited: Date.now(),
+            attachedImages: [req.body.attachedImages]
+        };
+
+        Post.findOneAndUpdate({_id: req.body._id}, editPostData, (err, data) => {
+            if (err) {
+                reject(err)
+            } else {
+                resolve(data)
+            }
+        });
+    });
+};
+
+
+
 const getPosts = () => {
     return new Promise(function (resolve, reject) {
         Post.find({})
@@ -52,6 +74,18 @@ const getPosts = () => {
                     reject(error)
                 }
             })
+    });
+};
+
+const removePost = req => {
+    return new Promise(function (resolve, reject) {
+        Post.findOneAndRemove({_id: req.body.id}, err => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve();
+            }
+        });
     });
 };
 
@@ -70,7 +104,9 @@ const chengeStatus = req => {
 
 module.exports = {
     Post,
-    addPost,
+    add: addPost,
+    edit: editPost,
+    remove: removePost,
     getPosts,
     chengeStatus
 };

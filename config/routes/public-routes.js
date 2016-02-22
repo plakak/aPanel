@@ -5,7 +5,7 @@ var Post = require('../models/posts');
 var router = express.Router();
 
 
-router.get('/getData/:type?/', (req,res) => {
+router.get('/getData/:type/:category?', (req,res) => {
     if(!req.params.type){
         res.status(404).end('No such type');
     } else {
@@ -22,9 +22,15 @@ router.get('/getData/:type?/', (req,res) => {
                     .catch(err => console.log(err));
                 break;
             case 'media':
-                Media.getMedia()
-                    .then(data => res.json(data))
-                    .catch(err => console.log(err));
+                if (!req.params.category) {
+                    Media.getMedia()
+                        .then(data => res.json(data))
+                        .catch(err => console.log(err));
+                } else {
+                    Media.getCategory(req.params.category)
+                        .then(data => res.json(data))
+                        .catch(err => console.log(err));
+                }
                 break;
             default:
                 res.status(404).end('No such type');

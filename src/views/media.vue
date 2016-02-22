@@ -60,8 +60,9 @@
         /*lost-utility: edit;*/
     }
 
-    .test{
+    .item {
         display: flex;
+        position: relative;
         flex-direction: column;
         border-radius: 4px;
         flex-basis: calc(100% / 3 - 15px);
@@ -70,8 +71,17 @@
         align-items: center;
         justify-content: center;
         background-color: #00b3ee;
-
     }
+
+    .remove-button {
+        position: absolute;
+        top: -10px;
+        right: -5px;
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 1.3em;
+    }
+
     .image{
         flex: 2;
         display: flex;
@@ -109,13 +119,17 @@
             <div class="panel-body color-bar-pages">
                 <div class="scroll-container">
                     <div class="image-container">
-                        <div class="test" v-for="image in mediaData | orderBy 'uploaded' -1">
+                        <div class="item" v-for="image in mediaData | orderBy 'uploaded' -1">
+                            <span class="remove-button" @click="_deleteItem(image)">X</span>
                             <div class="image">
                                 <img :src="image.relativePath"/>
                             </div>
                             <div class="description">
                                 {{ image.originalname }}
                             </div>
+                          <div v-if="image.category.indexOf('posts') !== -1">
+                              Warning, used in posts.
+                          </div>
                         </div>
                     </div>
                 </div>
@@ -196,7 +210,6 @@
             uploadFile,
             modal
         },
-        //todo: if category posts = used in posts
         methods: {
             submitHandeler(files){
                 var formData = new FormData();
@@ -226,6 +239,12 @@
                         this.$broadcast('fileSent', true)
                     })
                     .catch(() => this.$broadcast('fileSent', false));
+            },
+            _deleteItem(item){
+                // todo: remove reference from posts that were attaching this image
+                axios.post('/aPanel/tasks/media/remove', {id: item._id})
+                        .then(() => this.mediaData.$remove(item))
+                        .catch(err => console.log(err, 'error'));
             }
         }
     }
