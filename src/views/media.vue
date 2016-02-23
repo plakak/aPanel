@@ -300,27 +300,38 @@
 
                 let promises = [];
 
-                this.postData.forEach(next => {
-                    if (next.attachedImages) {
+                this.postData.forEach((next, idx, arr) => {
+                    if (next.attachedImages > 0) {
+
                         next.attachedImages.forEach(e => {
                             if (e._id === item._id) {
-                                //todo: add alert that this image is used in a post
-                                let index = next.attachedImages.indexOf(e);
-                                let tmpItems = [...next.attachedImages.slice(0, index), ...next.attachedImages.slice(index + 1)];
+                                if(confirm(`This image is used in a ${next.title} post.
+                                    Are you sure you want to delete it?`)) {
+                                    let index = next.attachedImages.indexOf(e);
+                                    let tmpItems = [...next.attachedImages.slice(0, index), ...next.attachedImages.slice(index + 1)];
 
-                                promises.push(
-                                    axios.post('/aPanel/tasks/posts/edit', {attachedImages: tmpItems})
-                                        .catch(err => console.log(err, 'error')),
-                                    axios.post('/aPanel/tasks/media/remove', {id: item._id})
-                                            .then(() => this.mediaData.$remove(item))
-                                            .catch(err => console.log(err, 'error'))
-                                )
+                                    promises.push(
+                                        axios.post('/aPanel/tasks/posts/edit', {attachedImages: tmpItems})
+                                            .catch(err => console.log(err, 'error')),
+                                        axios.post('/aPanel/tasks/media/remove', {id: item._id})
+                                                .then(() => this.mediaData.$remove(item))
+                                                .catch(err => console.log(err, 'error'))
+                                    )
+                                }
                             } else {
-                                axios.post('/aPanel/tasks/media/remove', {id: item._id})
-                                    .then(() => this.mediaData.$remove(item))
-                                    .catch(err => console.log(err, 'error'));
+                                promises.push(
+                                    axios.post('/aPanel/tasks/media/remove', {id: item._id})
+                                        .then(() => this.mediaData.$remove(item))
+                                        .catch(err => console.log(err, 'error')));
                             }
                         });
+                    } else {
+                        if (idx === arr.length -1) {
+                            promises.push(
+                                axios.post('/aPanel/tasks/media/remove', {id: item._id})
+                                    .then(() => this.mediaData.$remove(item))
+                                    .catch(err => console.log(err, 'error')));
+                        }
                     }
                 });
 
