@@ -41,7 +41,7 @@
         }
 
     .media-button--submit{
-        background-color: #313a5b;
+        background-color: #553a5b;
 
         &:hover {
              background-color: lighten(#313a5b, 10%);
@@ -73,6 +73,25 @@
         margin: 9px 10px;
     }
 
+    .category-selector{
+        margin: auto;
+        margin-bottom: 1em;
+        width: 50%;
+
+        input {
+            border-radius: 4px;
+            box-shadow: 0;
+            border: 0;
+            background-color: rgba(#2d0101,.2);
+
+            &::-webkit-calendar-picker-indicator {
+                 background-color: transparent;
+             }
+        }
+    }
+
+
+
 </style>
 
 <template>
@@ -81,10 +100,18 @@
 
         <label class="filename" :style="sendIndicator" v-dropbox="files">
             {{ fileName }}
-            <i class="glyphicon glyphicon-remove-circle clear-selected-file" @click="clearSelected" v-show="file"></i>
+            <i class="glyphicon glyphicon-remove-circle clear-selected-file" @click="clearSelected" v-show="files"></i>
         </label>
-        <label class="media-button--select" for="file" >Select files</label>
 
+        <div v-if='files' class="category-selector">
+            <span> Category:</span>
+            <input type="text" list="categoryList" v-model="selectedCategory">
+            <datalist id="categoryList">
+                <option v-for="category in categories">{{ category }}</option>
+            </datalist>
+        </div>
+
+        <label class="media-button--select" for="file" >Select files</label>
         <input id="file" type="file" name="media" v-on:change="_onFileChange" multiple />
         <label class="media-button--submit" @click="fileSubmit">Submit</label>
     </form>
@@ -95,12 +122,14 @@
 
 
     export default {
-        props: ['submitHandeler'],
+        props: ['submitHandeler', 'categories'],
+
         data() {
             return {
                 files: '',
                 success: false,
-                failure: false
+                failure: false,
+                selectedCategory: ''
             }
         },
         computed: {
@@ -135,7 +164,7 @@
 
             fileSubmit(){
                 if (this.files) {
-                    this.submitHandeler(this.files)
+                    this.submitHandeler(this.files, this.selectedCategory)
                 }
             },
             clearSelected(){

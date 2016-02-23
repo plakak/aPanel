@@ -105,19 +105,6 @@ const removeCategory = req => {
 };
 
 
-const editCategory = req => {
-    return new Promise(function (resolve, reject) {
-
-        Settings.findOneAndUpdate({_id: req.body.id},{categories: req.body.categories}, {new : true}, (err, model) => {
-            if (!err) {
-                resolve(model);
-            } else {
-                reject(err);
-            }
-        });
-    });
-};
-
 const chengeStatus = req => {
     return new Promise(function (resolve, reject) {
 
@@ -143,7 +130,6 @@ const removeMedia = req => {
                 if (err) {
                     reject(err)
                 } else {
-                    console.log(data);
                     resolve(data);
                 }
             });
@@ -191,7 +177,6 @@ module.exports = {
     editMedia,
     saveMediaReference,
     addCategory,
-    editCategory,
     removeCategory,
     chengeStatus,
     removeMedia,

@@ -64,6 +64,10 @@
         overflow-y: scroll;
     }
 
+    .selected {
+        background-color: darken(#00b3ee, 10%);
+    }
+
 
 </style>
 
@@ -71,15 +75,20 @@
     <div>
         <div class="scroll-container">
             <div class="image-container">
-                <div class="categories"> {{ categories }} </div>
-                <div class="item" v-for="image in externalData | orderBy 'uploaded' -1 | byCategory selectedCategory ">
-                    <span class="remove-button" @click="deleteItem(image)">X</span>
+                <div class="item"
+                     v-for="image in externalData | orderBy 'uploaded' -1 | byCategory selectedCategory"
+                     @click="selectImage(image)"
+                     :class="{'selected': image.isSelected}"
+
+                >
                     <div class="image">
                         <img :src="image.relativePath"/>
                     </div>
-                    <div class="description">
+                    <div class="description"
+                         :class="{'selected': image.isSelected}">
                         {{ image.originalname }}
                     </div>
+                    {{ image.category }}
                     <div v-show="findPost(image)">
                         Used in post: {{ findPost(image) }}
                 </div>
@@ -95,35 +104,34 @@
     import moment from 'moment'
 
     export default {
-        props: ['externalData', 'selectedCategory', 'postData', 'deleteItem'],
+        props: ['externalData', 'selectedCategory', 'postData'],
 
-        data() {
-            return {
+        methods: {
+            findPost(image) {
+                let post = this.postData.reduce((acc, next) => {
+                    if (next.attachedImages) {
+                        next.attachedImages.forEach(e => {
+                            if (e._id === image._id) {
+                                acc.push(next.title)
+                            }
+                        })
+                    }
+                    return acc;
+                }, []);
 
+                return post.length > 0 ? post : false;
+            },
+            selectImage(image){
+                image.isSelected = !image.isSelected;
             }
         },
-       methods: {
-           findPost(image) {
-               let post = this.postData.reduce((acc, next) => {
-                   if (next.attachedImages) {
-                       next.attachedImages.forEach(e => {
-                           if (e._id === image._id) {
-                               acc.push(next.title)
-                           }
-                       })
-                   }
-                   return acc;
-               }, []);
-
-               return post.length > 0 ? post : false;
-           }
-       },
         filters: {
             'byCategory'(value, category){
                 if (category) {
                     return value.filter(item => item.category.some(e => e === category));
                 } else return value;
             }
-        }
+        },
+
     }
 </script>

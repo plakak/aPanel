@@ -34,6 +34,10 @@ html, body {
   @include color-bar(#9c8e38, "Posts");
 }
 
+.color-bar-media {
+  @include color-bar(#553a5b, "Media files");
+}
+
 body {
   background-color: lighten(#EDEFF0, 1%);
 }

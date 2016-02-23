@@ -68,8 +68,9 @@
             border-radius: 4px;
             cursor: pointer;
         }
+
         .active {
-            background-color: green;
+            background-color: lighten(#553a5b, 5%);
         }
     }
 
@@ -96,13 +97,21 @@
 </style>
 
 <template>
+    <media-details
+        v-if="showDetails"
+        :selected-items="selected"
+        :show-details.sync="showDetails"
+        :add-category="addCategory"
+        :categories="categories"
+
+    ></media-details>
     <div class="panel panel-default box-shadow">
-        <div class="panel-body color-bar-pages">
+        <div class="panel-body color-bar-media">
             <div class="categories">
                 <ul>
                     <div class="cat-list">
                     <li @click="selectedCategory = ''" :class="{'active': !selectedCategory}">All</li>
-                    <li v-for="category in categories" :class="{'active': category === selectedCategory}">
+                    <li v-for="category in categories" track-by="$index" :class="{'active': category === selectedCategory}">
                         <span @click="selectedCategory = category">{{ category }}</span>
                     </li>
                     </div>
@@ -111,23 +120,28 @@
                         <i class="glyphicon glyphicon-trash button" @click="deleteCategory"></i>
                     </div>
                 </ul>
-
             </div>
                 <media-files
                     :external-data="mediaData"
                     :selected-category="selectedCategory"
                     :post-data="postData"
-                    :delete-item="_deleteItem"
                 ></media-files>
+
+            <div class="main-controls" style="font-size: 1.5em">
+                <i class="glyphicon glyphicon-duplicate button" @click="selectAll" title="Select all"></i>
+                <i class="glyphicon glyphicon-option-horizontal button" @click="showDetails = !showDetails" title="Show details"></i>
+                <i class="glyphicon glyphicon-trash button" @click="deleteHandeler" title="Delete selected"></i>
+            </div>
+
+
             <div class="space"></div>
                 <upload-file
                         :submit-handeler="submitHandeler"
+                        :categories="categories"
                 >
                 </upload-file>
 
-                <div class="main-controls">
 
-                </div>
             </div>
         </div>
 
@@ -169,10 +183,11 @@
 
     import axios from 'axios';
     import { modal } from 'vue-strap';
-    import moment from 'moment'
+    import moment from 'moment';
 
-    import mediaFiles from '../components/mediaFiles.vue'
-    import uploadFile from '../components/uploadFile.vue'
+    import mediaFiles from '../components/mediaFiles.vue';
+    import uploadFile from '../components/uploadFile.vue';
+    import mediaDetails from '../components/mediaDetails.vue';
 
     export default {
         route: {
@@ -182,11 +197,11 @@
                         .then(response => {
                             return response.data.map(e => {
                                 return Object.assign({}, e,
-                                        {
-                                            isDetails: false,
-                                            isSelected: false,
-                                            isEdited: false
-                                        });
+                                    {
+                                        isDetails: false,
+                                        isSelected: false,
+                                        isEdited: false
+                                    });
                             });
                         }),
                     axios.get('/aPanel/tasks/siteStatus')
@@ -212,6 +227,7 @@
         components: {
             mediaFiles,
             uploadFile,
+            mediaDetails,
             modal
         },
         data() {
@@ -225,7 +241,13 @@
                 mediaData: [],
                 categories: [],
                 postData: [],
-                selectedCategory: ''
+                selectedCategory: '',
+                showDetails: false
+            }
+        },
+        computed: {
+            selected() {
+                return this.mediaData.filter(e => e.isSelected);
             }
         },
         methods: {
@@ -250,6 +272,7 @@
                                 let tmpItems = [...image.category.slice(0, index), ...image.category.slice(index + 1)];
                                 promises.push(
                                         axios.post('/aPanel/tasks/media/edit', {id: image._id, category: tmpItems})
+                                                .then(() => image.category = tmpItems)
                                                 .catch(err => console.log(err, 'error'))
                                 )
                             }
@@ -264,15 +287,27 @@
                             .catch(err => console.log(err));
                 }
             },
-            //todo: edit categories and edit media in general (+ adding categories before uploading)
 
-            submitHandeler(files){
+            selectAll() {
+                this.mediaData.forEach(item => {
+                    item.isSelected = !item.isSelected;
+                });
+            },
+
+            submitHandeler(files, category){
                 var formData = new FormData();
 
                 for (let file in files){
                     if (files.hasOwnProperty(file)) {
                         formData.append('media', files[file]);
                     }
+                }
+
+                if (category) {
+                    if (this.categories.indexOf(category) === -1) {
+                        this.addCategory(category);
+                    }
+                    formData.append('category', category);
                 }
 
                 axios.post('/aPanel/tasks/media/add', formData)
@@ -296,8 +331,31 @@
                     .catch(() => this.$broadcast('fileSent', false));
             },
 
-            _deleteItem(item){
+            deleteHandeler(){
+                if (this.selected.length > 1) {
+                    this.$set('deleteModal.items', `${this.selected.length} items?`);
+                    this.$set('deleteModal.modalIsOpen', !this.deleteModal.modalIsOpen);
+                    this.$set('deleteModal.toRemove', this.selected);
 
+                } else {
+                    this.$set('deleteModal.items', `${this.selected[0].originalname}?`);
+                    this.$set('deleteModal.modalIsOpen', !this.deleteModal.modalIsOpen);
+                    this.$set('deleteModal.toRemove', this.selected);
+                }
+
+            },
+            removePageConfirmation(bool){
+                if (!bool) {
+                    this.$set('deleteModal.modalIsOpen', !this.deleteModal.modalIsOpen);
+                    this.$set('deleteModal.toRemove', []);
+                } else {
+                    this.deleteModal.toRemove.forEach(item => this._deleteItem(item));
+                    this.$set('deleteModal.toRemove', []);
+                    this.$set('deleteModal.modalIsOpen', !this.deleteModal.modalIsOpen);
+                }
+            },
+
+            _deleteItem(item){
                 let promises = [];
 
                 this.postData.forEach((next, idx, arr) => {
@@ -336,6 +394,7 @@
                 });
 
                 Promise.all(promises)
+                    .then(() => this.selected = [])
                     .catch(err => console.log(err));
 
             }
