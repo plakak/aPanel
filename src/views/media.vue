@@ -48,6 +48,7 @@
     .categories {
         flex: 1;
         flex-basis: 100%;
+        transition: all .4s linear;
 
         ul {
             background-color: rgba(220,220,220, 0.2);
@@ -58,6 +59,7 @@
             padding: 1em;
             margin-top: 1em;
             flex-wrap: wrap;
+
         }
         li {
             background-color: slategray;
@@ -71,6 +73,7 @@
 
         .active {
             background-color: lighten(#553a5b, 5%);
+            transition: all 0.4s linear;
         }
     }
 
@@ -79,6 +82,7 @@
         flex: 5;
         flex-wrap: wrap;
         justify-content: flex-start;
+        transition: all .4s linear;
     }
 
     .categories-controls {
@@ -321,7 +325,7 @@
                             });
                         });
 
-                        this.mediaData = this.mediaData = [
+                        this.mediaData = [
                             ...newEntries,
                             ...this.mediaData
                         ];

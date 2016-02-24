@@ -47,18 +47,14 @@ const saveMediaReference = (file, req) => {
 };
 
 
-const editMedia = (req) => {
+const editMedia = req => {
     return new Promise((resolve, reject) => {
-        var updateMedia;
 
-        if (req.body.originalname) {
-            updateMedia = {
-                originalname: req.body.originalname,
-                category: req.body.category ? req.body.category.replace(/\W+/g, " ").split(' ') : ''
-            };
-        } else {
-            updateMedia = {category: req.body.category};
-        }
+        var updateMedia = {
+            originalname: req.body.originalname,
+            category: req.body.category
+        };
+
 
         Media.findOneAndUpdate({_id: req.body.id}, updateMedia, {new : true}, (err, model) => {
             if (!err) {

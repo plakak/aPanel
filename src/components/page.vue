@@ -83,6 +83,8 @@
         height: 50px;
         top: 0;
         left: 0;
+        z-index: 2;
+        backgorund-color: transparent;
 
         &:hover {
             width: 100%;
@@ -142,6 +144,10 @@
         font-size: 1.5em;
     }
 
+    .full-width {
+        min-width: 100%;
+    }
+
 
 </style>
 
@@ -192,7 +198,7 @@
                 </div>
 
                 <label class="page-label" for="title">Title</label>
-                <input :class="formIndicatorsTitle" type="text" name="title" id="title" v-model="title" placeholder="Your title" />
+                <input :class="formIndicatorsTitle" class="full-width" type="text" name="title" id="title" v-model="title" placeholder="Your title" />
                 <label class="page-label" for="content">Content</label>
                 <textarea :class="formIndicatorsContent" name="content" id="content" v-model="content" placeholder="Your content"></textarea>
                 <slot>

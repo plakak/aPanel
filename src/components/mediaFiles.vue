@@ -2,6 +2,7 @@
 
     img {
         max-width: 100%;
+
     }
 
     .image-container{
@@ -9,55 +10,41 @@
         flex-wrap: wrap;
         align-items: flex-start;
         justify-content: center;
-        /*lost-center: 100%;*/
-        /*height: 100%;*/
-        /*lost-utility: edit;*/
     }
 
     .item {
-        display: flex;
         position: relative;
-        flex-direction: column;
-        border-radius: 4px;
-        flex-basis: calc(100% / 3 - 15px);
+        display: flex;
+        width: 200px;
+        height: 200px;
+        border-radius: 10px;
+        border: 3px solid snow;
+        box-shadow: 5px 5px 5px rgba(0,0,0,0.2);
         margin: 5px;
-        padding: 5px;
-        align-items: center;
-        justify-content: center;
-        background-color: #00b3ee;
-    }
-
-    .remove-button {
-        position: absolute;
-        top: -10px;
-        right: -5px;
+        padding: 10px 5px;
+        background-color: darken(#00b3ee, 10%);
+        color: white;
         cursor: pointer;
-        font-weight: 700;
-        font-size: 1.3em;
-    }
-
-    .image{
-        flex: 2;
-        display: flex;
-        align-items: center;
-        vertical-align: bottom;
-
-    }
-
-    .description {
-        flex: 1;
-        background-color: lighten(#00b3ee,20%);
-        display: flex;
-        word-break: break-all;
-        align-self: stretch;
         justify-content: center;
         align-items: center;
-        text-align: center;
-        padding: 10px;
+        user-select: none;
     }
 
+    .item-inside {
 
-    .scroll-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .image {
+        display: flex;
+        align-items: center;
+        align-self: center;
+    }
+
+     .scroll-container {
         background-color: rgba(220,220,220, 0.2);
         padding: 20px;
         height: 35em;
@@ -65,7 +52,54 @@
     }
 
     .selected {
-        background-color: darken(#00b3ee, 10%);
+        background-color: darken(#00b3ee, 30%) ;
+    }
+
+    .info {
+        display: block;
+        opacity: 0;
+        font-size: 1.2em;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 10px;
+        line-height: 2em;
+        padding: 10px;
+        background-color: rgba(0,0,0,.4);
+        overflow-y: hidden;
+        transition: opacity .3s linear;
+    }
+
+    .info-open {
+        opacity: 1;
+    }
+
+    .file-name {
+        display: block;
+        font-weight: bold;
+        margin-top: -.5em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 200px;
+    }
+
+    .file-details {
+        font-weight: 400;
+        line-height: 1em;
+        margin-top: 5px;
+        margin-left: 0;
+        padding: 0;
+    }
+
+    .italic-span {
+        font-style: italic;
+    }
+
+    .post-use {
+        margin-top: 10px;
     }
 
 
@@ -77,25 +111,36 @@
             <div class="image-container">
                 <div class="item"
                      v-for="image in externalData | orderBy 'uploaded' -1 | byCategory selectedCategory"
+                     @dblclick="image.isDetails = !image.isDetails"
                      @click="selectImage(image)"
                      :class="{'selected': image.isSelected}"
-
                 >
-                    <div class="image">
-                        <img :src="image.relativePath"/>
+                    <div class="item-inside">
+                        <div class="image">
+                            <img :src="image.relativePath"/>
+                        </div>
                     </div>
-                    <div class="description"
-                         :class="{'selected': image.isSelected}">
-                        {{ image.originalname }}
+                    <div class="info" :class="{'info-open': image.isDetails}" >
+                        <div class='file-name'>
+                            {{ image.originalname }}
+                        </div>
+                        <div class='file-details'>
+                            Categories:
+                            <span class="italic-span">
+                                {{ image.category }}
+                            </span>
+                            <div class="post-use">
+                                Used in post:
+                                <span class="italic-span" v-show="findPost(image)">
+                                    {{ findPost(image) }}
+                                </span>
+                            </div>
+                        </div>
                     </div>
-                    {{ image.category }}
-                    <div v-show="findPost(image)">
-                        Used in post: {{ findPost(image) }}
                 </div>
-            </div>
         </div>
     </div>
-
+        </div>
 
 </template>
 
