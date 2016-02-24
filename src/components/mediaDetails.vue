@@ -27,6 +27,22 @@
         transition: opacity 0.4s linear;
     }
 
+    .categories-modefied {
+        background-color:  rgba(#d5706b, 0.4);
+    }
+
+    .categories {
+        position: relative;
+    }
+
+    .category-warning {
+        background-color: rgba(#d5706b, 0.4) !important;
+    }
+
+    .active.category-warning {
+        background-color: rgba(#d5706b, 0.8) !important;
+    }
+
 
 </style>
 
@@ -38,10 +54,12 @@
             </div>
             <div v-else>
                 Batch modify category:
-                <div class="categories">
+                <div class="categories" :class="{ 'categories-modefied': !isPristine }">
                     <ul>
                         <div class="cat-list">
-                            <li v-for="category in newCategories" :class="{'active': category === selectedCategory}">
+                            <li v-for="category in newCategoryList"
+                                :class="{'active': category === selectedCategory, 'category-warning': notSharedCategory(category) }"
+                            >
                                 <span @click="selectedCategory = category">{{ category }}</span>
                             </li>
                         </div>
@@ -53,13 +71,13 @@
 
                 <div class="category-selector">
                     <span> Category:</span>
-                    <input type="text" list="categoryList" v-model="selectedCategory">
+                    <input type="text" list="categoryList" v-model="newCategory">
                     <datalist id="categoryList">
                         <option v-for="category in filteredCategories">{{ category }}</option>
                     </datalist>
                     <i class="glyphicon glyphicon-plus button" @click="addToList"></i>
                 </div>
-
+                <button @click="batchUpdate" :disabled="isPristine">Go</button>
             </div>
             <i class="glyphicon glyphicon-remove button close-details" @click="showDetails = !showDetails"></i>
         </div>
@@ -76,12 +94,13 @@
         props: ['selectedItems', 'categories', 'showDetails', 'addCategory'],
         data() {
           return {
-              newCategories: [],
+              newCategoryList: [],
+              newCategory:'',
               selectedCategory: ''
           }
         },
         ready() {
-            this.$set('newCategories', this.currentCategories);
+            this.$set('newCategoryList', this.currentCategories);
         },
         computed: {
             single() {
@@ -92,43 +111,63 @@
                     if (next.category.length > 0) {
                         next.category.forEach(category => {
                            if (acc.indexOf(category) === -1) {
-                               acc.push(category)
+                               acc.push(category);
                            }
                         });
                     }
                     return acc;
                 },[]);
             },
+
             filteredCategories(){
                 return this.categories.reduce((acc, next) => {
-                   if (this.newCategories.indexOf(next) === -1) {
+                   if (this.newCategoryList.indexOf(next) === -1) {
                        acc.push(next);
                    }
                     return acc;
                 },[]);
             },
             isPristine(){
-                return this.newCategories.every(catA => this.currentCategories.find(catB => catB === catA));
+                return this.currentCategories.every(catA =>
+                    this.newCategoryList.indexOf(catA) !== -1) &&
+                    this.currentCategories.length === this.newCategoryList.length;
             }
+            // todo: add check for isPristine when 'notSharedCategory' is false (forEach all newList)
         },
         methods: {
             addToList(){
-                if (this.selectedCategory) {
-                    if (this.categories.indexOf(this.selectedCategory) === -1) {
-                        this.addCategory(this.selectedCategory);
-                    }
-
-                    this.newCategories.push(this.selectedCategory);
-                    this.$set('selectedCategory', '');
+                if (this.newCategory) {
+                    this.$set('newCategoryList', this.newCategoryList.concat(this.newCategory));
+                    this.$set('newCategory', '');
                 }
             },
             removeFromList(){
-
+                this.newCategoryList.$remove(this.selectedCategory);
             },
             batchUpdate(){
-                axios.post('/aPanel/tasks/media/edit', {category: newCategories})
+
+                let promises = [];
+
+                this.newCategoryList.forEach(category => {
+                    if (this.categories.indexOf(category) === -1) {
+                        this.addCategory(category);
+                    }
+                });
+
+                this.selectedItems.forEach(image => {
+                    promises.push(axios.post('/aPanel/tasks/media/edit', {id: image._id, category: this.newCategoryList})
+                        .then(() => image.category = this.newCategoryList)
+                    )
+                });
+
+                Promise.all(promises)
                     .then(() => console.log('saved'))
-                    .catch(err => console.log('unsaved', err));
+                    .catch( err => console.log('error', err));
+
+            },
+            /* When category is present on one image but not on the other */
+            notSharedCategory(input) {
+                return this.selectedItems.every(e => e.category.indexOf(input) !== -1);
             }
         }
     }
