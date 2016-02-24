@@ -77,7 +77,7 @@
                     </datalist>
                     <i class="glyphicon glyphicon-plus button" @click="addToList"></i>
                 </div>
-                <button @click="batchUpdate" :disabled="isPristine">Go</button>
+                <button @click="batchUpdate" :disabled="isPristine && !categoryDiscrepancy">Go</button>
             </div>
             <i class="glyphicon glyphicon-remove button close-details" @click="showDetails = !showDetails"></i>
         </div>
@@ -131,8 +131,16 @@
                 return this.currentCategories.every(catA =>
                     this.newCategoryList.indexOf(catA) !== -1) &&
                     this.currentCategories.length === this.newCategoryList.length;
+            },
+            categoryDiscrepancy(){
+                return this.newCategoryList.reduce((acc, next) => {
+                    if (this.notSharedCategory(next)){
+                        acc = true;
+                    }
+                    return acc;
+                }, false);
+
             }
-            // todo: add check for isPristine when 'notSharedCategory' is false (forEach all newList)
         },
         methods: {
             addToList(){
@@ -167,7 +175,7 @@
             },
             /* When category is present on one image but not on the other */
             notSharedCategory(input) {
-                return this.selectedItems.every(e => e.category.indexOf(input) !== -1);
+                return !this.selectedItems.every(e => e.category.indexOf(input) !== -1);
             }
         }
     }
