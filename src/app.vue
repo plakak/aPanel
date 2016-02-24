@@ -41,7 +41,7 @@
                     <a class="navbar-brand" v-link="'/home'">aPanel</a>
                 </div>
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a v-link="'/site'" @click='killSite()'>Site Management</a></li>
+                    <li><a  @click='killSite()'>Site Management</a></li>
                     <li><a v-link="'/users'">Users Management</a></li>
                     <li><a href="/aPanel/logout">Logout</a></li>
                 </ul>
