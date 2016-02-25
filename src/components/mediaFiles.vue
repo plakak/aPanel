@@ -121,10 +121,8 @@
             <div class="image-container">
                 <div class="item"
                      v-for="image in externalData | orderBy 'uploaded' -1 | byCategory selectedCategory"
-                     @dblclick="image.isDetails = !image.isDetails"
                      @click="selectImage(image)"
-                     :class="{'selected': image.isSelected}"
-                >
+                     v-db-click-handler>
                     <div class="item-inside">
                         <div class="image">
                             <img :src="image.relativePath" />
