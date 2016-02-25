@@ -133,7 +133,7 @@
 
             <div class="main-controls" style="font-size: 1.5em">
                 <i class="glyphicon glyphicon-duplicate button" @click="selectAll" title="Select all"></i>
-                <i class="glyphicon glyphicon-option-horizontal button" @click="showDetails = !showDetails" title="Show details"></i>
+                <i class="glyphicon glyphicon-option-horizontal button" @click="toggleDetails" title="Show details"></i>
                 <i class="glyphicon glyphicon-trash button" @click="deleteHandeler" title="Delete selected"></i>
             </div>
 
@@ -296,6 +296,12 @@
                 this.mediaData.forEach(item => {
                     item.isSelected = !item.isSelected;
                 });
+            },
+
+            toggleDetails(){
+                if (this.selected.length > 0){
+                    this.$set('showDetails', !this.showDetails);
+                }
             },
 
             submitHandeler(files, category){
