@@ -25,16 +25,20 @@ const addPost = req => {
             dateEdited: Date.now(),
             by: req.body.by,
             isActive: false,
-            attachedImages: [req.body.attachedImages]
+            attachedImages: req.body.attachedImages ? req.body.attachedImages: []
         };
 
         var newPost = new Post(newPostData);
 
-        newPost.save((error, data) => {
+        newPost.save(error => {
             if (error) {
                 reject(error)
             } else {
-                resolve(data);
+                newPost.populate('attachedImages', err => {
+                    if (!err) {
+                        resolve(newPost);
+                    } else reject(err);
+                });
             }
         });
     });
@@ -44,22 +48,14 @@ const addPost = req => {
 const editPost = req => {
     return new Promise((resolve, reject) => {
 
-        var editPostData;
+        var editPostData = {
+            title: req.body.title,
+            content: req.body.content,
+            dateEdited: Date.now(),
+            attachedImages: req.body.attachedImages ? req.body.attachedImages : []
+        };
 
-        if (req.body.title) {
-
-            editPostData = {
-                title: req.body.title,
-                content: req.body.content,
-                dateEdited: Date.now(),
-                attachedImages: [req.body.attachedImages]
-            };
-
-        } else {
-            editPostData = {attachedImages: [req.body.attachedImages]};
-        }
-
-        Post.findOneAndUpdate({_id: req.body._id}, editPostData, (err, data) => {
+        Post.findOneAndUpdate({_id: req.body.id}, editPostData, {new: true}).populate('attachedImages').exec((err, data) => {
             if (err) {
                 reject(err)
             } else {

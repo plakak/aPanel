@@ -45,18 +45,28 @@
     }
 
      .scroll-container {
-        background-color: rgba(220,220,220, 0.2);
         padding: 20px;
         height: 35em;
         overflow-y: scroll;
     }
 
+     .normal-color {
+         background-color: rgba(220,220,220, 0.2);
+         transition: all 0.3s linear;
+     }
+
+     .warning-color {
+         background-color: rgba(#d5706b, 0.4);
+         transition: all 0.3s linear;
+     }
+
     .selected {
         background-color: darken(#00b3ee, 30%) ;
     }
 
-    .info {
-        display: block;
+    .media-info {
+        /*display: flex;*/
+        justify-content: space-around;
         opacity: 0;
         font-size: 1.2em;
         position: absolute;
@@ -107,7 +117,7 @@
 
 <template>
     <div>
-        <div class="scroll-container">
+        <div class="scroll-container" :class='isWarning'>
             <div class="image-container">
                 <div class="item"
                      v-for="image in externalData | orderBy 'uploaded' -1 | byCategory selectedCategory"
@@ -117,10 +127,10 @@
                 >
                     <div class="item-inside">
                         <div class="image">
-                            <img :src="image.relativePath"/>
+                            <img :src="image.relativePath" />
                         </div>
                     </div>
-                    <div class="info" :class="{'info-open': image.isDetails}" >
+                    <div class="media-info" :class="{'info-open': image.isDetails}" >
                         <div class='file-name'>
                             {{ image.originalname }}
                         </div>
@@ -149,7 +159,13 @@
     import moment from 'moment'
 
     export default {
-        props: ['externalData', 'selectedCategory', 'postData'],
+        props: ['externalData', 'selectedCategory', 'postData', 'warning'],
+
+        computed: {
+           isWarning() {
+               return this.warning ? 'warning-color' : 'normal-color'
+           }
+        },
 
         methods: {
             findPost(image) {
@@ -176,7 +192,6 @@
                     return value.filter(item => item.category.some(e => e === category));
                 } else return value;
             }
-        },
-
+        }
     }
 </script>

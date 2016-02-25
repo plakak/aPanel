@@ -32,7 +32,7 @@
         justify-content: flex-end;
 
         .button {
-         padding: 20px;
+             padding: 20px;
         }
     }
 
@@ -43,6 +43,13 @@
     .lower-opacity {
         opacity: 0.7;
         color: gray;
+    }
+
+    .open-upload-button {
+        font-size: 1.5em;
+        text-align: right;
+        margin-top: 1em;
+        margin-bottom: 1em;
     }
 
 
@@ -56,15 +63,14 @@
                 <div v-for="page in pageData | orderBy 'datePublished' -1">
                     <page class="page_space"
                           :external-data="page"
+                          :media-data="mediaData"
+                          :post-data="pageData"
                           :show-details="showDetails.bind(null, page)"
                           :remove-page="deleteHandler.bind(null,page)"
                           :change-visibility="changeVisibility.bind(null, page)"
                           :save-data="saveData.bind(null, page)"
                           :photo="true"
                     >
-                        <div v-else v-for="image in page.attachedImages">
-                            <img :src="image.relativePath">
-                        </div>
                     </page>
                 </div>
                 <div class="main-controls">
@@ -97,7 +103,7 @@
     import moment from 'moment'
 
     import page from '../components/page.vue'
-    import mediaFiles from '../components/mediaFiles.vue'
+
 
     export default {
         route: {
@@ -152,8 +158,7 @@
         },
         components: {
             page,
-            modal,
-            mediaFiles
+            modal
         },
 
         methods: {
@@ -163,6 +168,7 @@
 
                     {
                         title: '',
+                        attachedImages: [],
                         isSelected: false,
                         isDetails: true,
                         isSaved: false,
@@ -173,38 +179,49 @@
 
                 ]);
             },
-
             saveData(page, data){
                 if (!page.isSaved) {
+
                     axios.post('/aPanel/tasks/posts/add',
                             {
                                 title: data.title,
                                 content: data.content,
+                                attachedImages: data.attachedImages,
                                 by: isLoggedIn.username
                             })
 
                             .then((resp) => {
+                                console.log(resp.data)
+                                page._id = resp.data._id;
                                 page.isSaved = true;
                                 page.isEdited = false;
+                                page.attachedImages = resp.data.attachedImages;
                                 page.title = resp.data.title;
                                 page.content = resp.data.content;
+                                this.$broadcast('saved');
                             })
 
                             .catch(err => console.log(err, 'error'));
 
                 } else {
+
                     axios.post('/aPanel/tasks/posts/edit',
                             {
                                 title: data.title,
                                 content: data.content,
-                                id: page._id
+                                id: page._id,
+                                attachedImages: data.attachedImages
                             })
 
                             .then((resp) => {
+                                console.log(resp.data)
                                 page.isEdited = false;
                                 page.title = resp.data.title;
+                                page.attachedImages = resp.data.attachedImages;
                                 page.content = resp.data.content;
                                 page.dateEdited = moment.now();
+                                this.$broadcast('saved');
+
                             })
 
                             .catch(err => console.log(err, 'error'));
@@ -275,8 +292,6 @@
                         .then(() => this.pageData.$remove(page))
                         .catch(err => console.log(err, 'error'));
             }
-
         }
-
     }
 </script>

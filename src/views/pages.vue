@@ -158,6 +158,7 @@
                                 by: isLoggedIn.username
                             })
                     .then((resp) => {
+                        page._id = resp.data._id;
                         page.isSaved = true;
                         page.isEdited = false;
                         page.title = resp.data.title;

@@ -25,7 +25,7 @@
              overflow-y: hidden;
          }
         &--open--images {
-             max-height: 1000px;
+             max-height: 2000px;
              transition: max-height .3s ease-out;
              overflow: auto;
              overflow-y: hidden;
@@ -83,7 +83,7 @@
         height: 50px;
         top: 0;
         left: 0;
-        z-index: 2;
+        /*z-index: 2;*/
         backgorund-color: transparent;
 
         &:hover {
@@ -96,7 +96,7 @@
         display: flex;
         justify-content: space-around;
 
-        /*flex-direction: column;*/
+    /*flex-direction: column;*/
 
         p {
            font-style: italic;
@@ -148,16 +148,26 @@
         min-width: 100%;
     }
 
+    .post-image-preview {
+        display: flex;
+        justify-content: center;
+        padding: 10px 10px 20px;
+    img {
+        padding: 3px;
+    }
+    }
+
+
 
 </style>
 
 <template>
-        <div class="page_container" :class="details">
-            <div class="click-container"  @click="showDetails"></div>
-            <div class="page_heading" :class="{'page_heading--selected': externalData.isSelected}">
-                <span class="indicator" :style="activeColor"> </span>
+    <div class="page_container" :class="details">
+        <div class="click-container"  @click="showDetails"></div>
+        <div class="page_heading" :class="{'page_heading--selected': externalData.isSelected}">
+            <span class="indicator" :style="activeColor"> </span>
 
-                <div class="content">{{title}}</div>
+            <div class="content">{{title}}</div>
 
                 <span class="buttons">
                     <i class="glyphicon glyphicon glyphicon-ok save-button"
@@ -184,29 +194,40 @@
                        title="Remove">
                     </i>
                 </span>
-            </div>
+        </div>
 
-            <div class="details">
+        <div class="details">
                 <span class="save-alert" v-show="!externalData.isSaved || externalData.isEdited">
                     Warning - this site is not saved!
                 </span>
 
-                <div class="info">
-                    <p>Published: {{ formattedPublishedDate }}</p>
-                    <p>Edit: {{ formattedEditDate }}</p>
-                    <p>Added by: {{ externalData.by }}</p>
+            <div class="info">
+                <p>Published: {{ formattedPublishedDate }}</p>
+                <p>Edit: {{ formattedEditDate }}</p>
+                <p>Added by: {{ externalData.by }}</p>
+            </div>
+
+            <label class="page-label" for="title">Title</label>
+            <input :class="formIndicatorsTitle" class="full-width" type="text" name="title" id="title" v-model="title" placeholder="Your title" />
+            <label class="page-label" for="content">Content</label>
+            <textarea :class="formIndicatorsContent" name="content" id="content" v-model="content" placeholder="Your content"></textarea>
+
+            <div class="post-image-preview">
+                <div v-for="image in externalData.attachedImages">
+                    <img :src="image.relativePath">
                 </div>
+            </div>
+            <i v-if="photo" class="glyphicon glyphicon-open-file open-upload-button" @click="postImageOpen = !postImageOpen"></i>
 
-                <label class="page-label" for="title">Title</label>
-                <input :class="formIndicatorsTitle" class="full-width" type="text" name="title" id="title" v-model="title" placeholder="Your title" />
-                <label class="page-label" for="content">Content</label>
-                <textarea :class="formIndicatorsContent" name="content" id="content" v-model="content" placeholder="Your content"></textarea>
-                <slot>
-
-                </slot>
-
+            <div v-if="postImageOpen">
+                <media-files
+                        :external-data="images"
+                        :post-data="postData"
+                        :warning="isWarning"
+                ></media-files>
             </div>
         </div>
+    </div>
 
 
 </template>
@@ -215,29 +236,44 @@
 
     import moment from 'moment'
 
+    import mediaFiles from './mediaFiles.vue'
+    import postFiles from './postFiles.vue';
+
     export default {
-        props: ['externalData', 'showDetails', 'removePage', 'changeVisibility', 'saveData', 'photo'],
+        props: ['externalData', 'mediaData', 'showDetails', 'removePage', 'changeVisibility', 'saveData', 'photo', 'postData'],
 
         data() {
             return {
                 title: '',
-                content: ''
+                content: '',
+                initialImages: [],
+                images: [],
+                postImageOpen: false
             }
         },
+        components: {
+            postFiles,
+            mediaFiles
+        },
         compiled(){
+            console.log(this.postData)
             this.$set('title', this.externalData.title);
             this.$set('content', this.externalData.content);
         },
+        ready(){
+            this.mainCheck();
+        },
         computed: {
+
             activeColor() {
                 return this.externalData.isActive ? {backgroundColor: '#71c271'} : {backgroundColor: '#d5706b'};
             },
             activeIcon() {
-              return {
-                  'glyphicon-eye-open': !this.externalData.isActive,
-                  'glyphicon-eye-close': this.externalData.isActive,
-                  'lower-opacity': !this.externalData.isSaved
-              }
+                return {
+                    'glyphicon-eye-open': !this.externalData.isActive,
+                    'glyphicon-eye-close': this.externalData.isActive,
+                    'lower-opacity': !this.externalData.isSaved
+                }
             },
             details() {
                 return {
@@ -247,20 +283,20 @@
                 }
             },
             formIndicatorsTitle(){
-                  return {
-                      'form-inputs': true,
-                      'form-inputs--untouched': this.title === this.externalData.title && this.externalData.isSaved,
-                      'form-inputs--unsaved': this.title !== this.externalData.title && this.externalData.isSaved ||
-                            !this.externalData.isSaved && !this.title,
-                      'form-inputs--valid': this.title && !this.externalData.isSaved
-                  }
+                return {
+                    'form-inputs': true,
+                    'form-inputs--untouched': this.title === this.externalData.title && this.externalData.isSaved,
+                    'form-inputs--unsaved': this.title !== this.externalData.title && this.externalData.isSaved ||
+                    !this.externalData.isSaved && !this.title,
+                    'form-inputs--valid': this.title && !this.externalData.isSaved
+                }
             },
             formIndicatorsContent(){
                 return {
                     'form-inputs': true,
                     'form-inputs--untouched': this.content === this.externalData.content && this.externalData.isSaved,
                     'form-inputs--unsaved': this.content !== this.externalData.content && this.externalData.isSaved ||
-                         !this.externalData.isSaved && !this.content,
+                    !this.externalData.isSaved && !this.content,
                     'form-inputs--valid': this.content  && !this.externalData.isSaved
 
                 }
@@ -270,27 +306,68 @@
             },
             formattedPublishedDate(){
                 return moment(this.externalData.datePublished).format('DD-MMM-YYYY HH:mm');
+            },
+            imagesChanged() {
+                return JSON.stringify(this.images) === JSON.stringify(this.initialImages);
+            },
+            isWarning() {
+                return !this.imagesChanged;
             }
         },
         methods: {
+            mainCheck() {
+                if (this.mediaData) {
+
+                    this.images = this.mediaData.map(e => Object.assign({}, e));
+
+                    if (this.photo && this.externalData.attachedImages) {
+                        this.images.forEach(image => {
+                            if (this.externalData.attachedImages.find(e => e._id === image._id)) {
+                                image.isSelected = true;
+                            }
+                        });
+                        this.initialImages = this.images.map(e => Object.assign({}, e));
+                    }
+
+                }
+            },
             undoEdits(){
                 this.$set('title', this.externalData.title);
                 this.$set('content', this.externalData.content);
             },
             saveEdits() {
-                this.saveData({title: this.title, content: this.content})
+                if (this.photo) {
+                    let attachedImages = this.images.filter(e => e.isSelected).map(e => e._id);
+                    this.saveData({title: this.title, content: this.content, attachedImages: attachedImages})
+                } else {
+                    this.saveData({title: this.title, content: this.content})
+                }
+
             }
+        },
+        events: {
+            'saved'(){
+                this.mainCheck();
+
+             }
         },
         watch: {
             'title'() {
-                if (this.content !== this.externalData.content || this.title !== this.externalData.title) {
+                if (this.content !== this.externalData.content || this.title !== this.externalData.title || !this.imagesChanged) {
                     this.$set('externalData.isEdited', true);
                 } else {
                     this.$set('externalData.isEdited', false);
                 }
             },
             'content'() {
-                if (this.content !== this.externalData.content || this.title !== this.externalData.title) {
+                if (this.content !== this.externalData.content || this.title !== this.externalData.title || !this.imagesChanged) {
+                    this.$set('externalData.isEdited', true);
+                } else {
+                    this.$set('externalData.isEdited', false);
+                }
+            },
+            'imagesChanged'(result){
+                if (this.content !== this.externalData.content || this.title !== this.externalData.title || !result){
                     this.$set('externalData.isEdited', true);
                 } else {
                     this.$set('externalData.isEdited', false);

@@ -63,7 +63,6 @@
 
     .single {
 
-
         .image-preview {
             text-align: center;
             max-width: 700px;
@@ -125,7 +124,7 @@
         <div class="media-details" :class="{'md-height-large': single, 'md-height-small': !single}">
             <div v-if="single" class="single">
                 <div class="image-preview">
-                    <img :src=selectedItems[0].relativePath/>
+                    <img :src="selectedItems[0].relativePath" />
                 </div>
                 <div>
                     <p class="title" @click="editTitle=!editTitle" v-if="!editTitle">{{ originalname }}</p>
