@@ -256,7 +256,6 @@
             mediaFiles
         },
         compiled(){
-            console.log(this.postData)
             this.$set('title', this.externalData.title);
             this.$set('content', this.externalData.content);
         },

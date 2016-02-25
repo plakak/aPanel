@@ -191,7 +191,6 @@
                             })
 
                             .then((resp) => {
-                                console.log(resp.data)
                                 page._id = resp.data._id;
                                 page.isSaved = true;
                                 page.isEdited = false;
@@ -214,7 +213,6 @@
                             })
 
                             .then((resp) => {
-                                console.log(resp.data)
                                 page.isEdited = false;
                                 page.title = resp.data.title;
                                 page.attachedImages = resp.data.attachedImages;
