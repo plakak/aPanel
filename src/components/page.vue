@@ -237,7 +237,6 @@
     import moment from 'moment'
 
     import mediaFiles from './mediaFiles.vue'
-    import postFiles from './postFiles.vue';
 
     export default {
         props: ['externalData', 'mediaData', 'showDetails', 'removePage', 'changeVisibility', 'saveData', 'photo', 'postData'],
@@ -252,7 +251,6 @@
             }
         },
         components: {
-            postFiles,
             mediaFiles
         },
         compiled(){
