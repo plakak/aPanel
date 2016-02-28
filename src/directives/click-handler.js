@@ -2,8 +2,14 @@ import Vue from 'vue';
 import Rx, {Observable} from 'rxjs';
 
 export default Vue.directive('db-click-handler', {
+    params: ['image'],
 
     bind() {
+
+        if (this.params.image.isSelected) {
+            this.el.classList.toggle('selected');
+        }
+
         this.clickSource = Rx.Observable.fromEvent(this.el, 'click').delay(150);
         this.dbClickSource =  Rx.Observable.fromEvent(this.el, 'dblclick');
 

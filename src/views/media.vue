@@ -243,6 +243,7 @@
                 },
                 modalAddCategory: false,
                 mediaData: [],
+                newCategory: '',
                 categories: [],
                 postData: [],
                 selectedCategory: '',

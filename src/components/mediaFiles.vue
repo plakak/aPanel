@@ -122,7 +122,7 @@
                 <div class="item"
                      v-for="image in externalData | orderBy 'uploaded' -1 | byCategory selectedCategory"
                      @click="selectImage(image)"
-                     v-db-click-handler>
+                     v-db-click-handler :image="image">
                     <div class="item-inside">
                         <div class="image">
                             <img :src="image.relativePath" />
@@ -170,6 +170,10 @@
                 required: true
             },
             warning: Boolean
+        },
+
+        ready(){
+//            console.log(this.externalData)
         },
 
         computed: {
