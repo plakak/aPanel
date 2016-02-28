@@ -186,7 +186,24 @@
     import axios from 'axios'
 
     export default {
-        props: ['selectedItems', 'categories', 'showDetails', 'addCategory'],
+        props: {
+            selectedItems: {
+                type: Array,
+                required: true
+            },
+            categories: {
+                type: Array,
+                required: true
+            },
+            showDetails: {
+                type: Boolean,
+                required: true
+            },
+            addCategory: {
+                type: Function,
+                required: true
+            }
+        },
         data() {
           return {
               newCategoryList: [],
@@ -278,7 +295,6 @@
                 });
 
                 Promise.all(promises)
-                    .then(() => console.log('saved'))
                     .catch( err => console.log('error', err));
 
             },

@@ -122,7 +122,16 @@
 
 
     export default {
-        props: ['submitHandeler', 'categories'],
+        props: {
+            submitHandeler:{
+                type: Function,
+                required: true
+            },
+            categories:{
+                type: Array,
+                required: true
+            }
+        },
 
         data() {
             return {

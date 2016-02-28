@@ -239,8 +239,35 @@
     import mediaFiles from './mediaFiles.vue'
 
     export default {
-        props: ['externalData', 'mediaData', 'showDetails', 'removePage', 'changeVisibility', 'saveData', 'photo', 'postData'],
-
+        props: {
+            externalData: {
+                type: Object,
+                required: true
+            },
+            mediaData: {
+                type: Array
+            },
+            postData: {
+              type: Array
+            },
+            showDetails: {
+                type: Function,
+                required: true
+            },
+            removePage: {
+                type: Function,
+                required: true
+            },
+            changeVisibility: {
+                type: Function,
+                required: true
+            },
+            saveData: {
+                type: Function,
+                required: true
+            },
+            photo: Boolean
+        },
         data() {
             return {
                 title: '',

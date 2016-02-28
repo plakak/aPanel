@@ -157,7 +157,20 @@
     import moment from 'moment'
 
     export default {
-        props: ['externalData', 'selectedCategory', 'postData', 'warning'],
+        props: {
+            externalData: {
+                type: Array,
+                required: true
+            },
+            selectedCategory: {
+                type: String
+            },
+            postData: {
+                type: Array,
+                required: true
+            },
+            warning: Boolean
+        },
 
         computed: {
            isWarning() {
