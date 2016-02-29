@@ -276,9 +276,13 @@
                                 let index = image.category.indexOf(category);
                                 let tmpItems = [...image.category.slice(0, index), ...image.category.slice(index + 1)];
                                 promises.push(
-                                        axios.post('/aPanel/tasks/media/edit', {id: image._id, category: tmpItems})
-                                                .then(() => image.category = tmpItems)
-                                                .catch(err => console.log(err, 'error'))
+                                        axios.post('/aPanel/tasks/media/edit', {
+                                            id: image._id,
+                                            category: tmpItems,
+                                            originalname: image.originalname
+                                        })
+                                            .then(() => image.category = tmpItems)
+                                            .catch(err => console.log(err, 'error'))
                                 )
                             }
                         }
@@ -348,7 +352,7 @@
                     this.$set('deleteModal.modalIsOpen', !this.deleteModal.modalIsOpen);
                     this.$set('deleteModal.toRemove', this.selected);
 
-                } else {
+                } else if (this.selected.length === 1) {
                     this.$set('deleteModal.items', `${this.selected[0].originalname}?`);
                     this.$set('deleteModal.modalIsOpen', !this.deleteModal.modalIsOpen);
                     this.$set('deleteModal.toRemove', this.selected);
@@ -368,46 +372,48 @@
 
             _deleteItem(item){
                 let promises = [];
+                let cancel = false;
 
-                this.postData.forEach((next, idx, arr) => {
-                    if (next.attachedImages > 0) {
-
+                this.postData.forEach(next => {
+                    if (next.attachedImages.length > 0) {
                         next.attachedImages.forEach(e => {
                             if (e._id === item._id) {
-                                if(confirm(`This image is used in a ${next.title} post.
-                                    Are you sure you want to delete it?`)) {
+                                let warning = confirm(`This image is used in a ${next.title} post. Are you sure you want to delete it?`);
+                                if (warning) {
                                     let index = next.attachedImages.indexOf(e);
                                     let tmpItems = [...next.attachedImages.slice(0, index), ...next.attachedImages.slice(index + 1)];
 
                                     promises.push(
-                                        axios.post('/aPanel/tasks/posts/edit', {attachedImages: tmpItems})
-                                            .catch(err => console.log(err, 'error')),
-                                        axios.post('/aPanel/tasks/media/remove', {id: item._id})
-                                                .then(() => this.mediaData.$remove(item))
-                                                .catch(err => console.log(err, 'error'))
-                                    )
+                                            axios.post('/aPanel/tasks/posts/edit', {
+                                                title: next.title,
+                                                content: next.content,
+                                                attachedImages: tmpItems
+                                            }).catch(err => console.log(err, 'error')),
+
+                                            axios.post('/aPanel/tasks/media/remove', {id: item._id})
+                                                    .then(() => this.mediaData.$remove(item))
+                                                    .catch(err => console.log(err, 'error'))
+                                    );
+                                } else {
+                                    cancel = true;
                                 }
-                            } else {
-                                promises.push(
-                                    axios.post('/aPanel/tasks/media/remove', {id: item._id})
-                                        .then(() => this.mediaData.$remove(item))
-                                        .catch(err => console.log(err, 'error')));
                             }
                         });
-                    } else {
-                        if (idx === arr.length -1) {
-                            promises.push(
-                                axios.post('/aPanel/tasks/media/remove', {id: item._id})
-                                    .then(() => this.mediaData.$remove(item))
-                                    .catch(err => console.log(err, 'error')));
-                        }
                     }
                 });
 
-                Promise.all(promises)
-                    .then(() => this.selected = [])
-                    .catch(err => console.log(err));
+                if (promises.length > 0) {
 
+                    Promise.all(promises)
+                        .then(() => this.selected = [])
+                        .catch(err => console.log(err));
+
+                } else if (promises.length === 0 && cancel === false) {
+
+                    axios.post('/aPanel/tasks/media/remove', {id: item._id})
+                        .then(() => this.mediaData.$remove(item))
+                        .catch(err => console.log(err, 'error'))
+                }
             }
         }
     }

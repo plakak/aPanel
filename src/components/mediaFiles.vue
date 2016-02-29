@@ -146,9 +146,9 @@
                         </div>
                     </div>
                 </div>
+            </div>
         </div>
     </div>
-        </div>
 
 </template>
 
@@ -170,10 +170,6 @@
                 required: true
             },
             warning: Boolean
-        },
-
-        ready(){
-//            console.log(this.externalData)
         },
 
         computed: {

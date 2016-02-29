@@ -287,7 +287,7 @@
                 this.selectedItems.forEach(image => {
                     promises.push(axios.post('/aPanel/tasks/media/edit', {
                         id: image._id,
-                        originalname: image.originalname,
+                        originalname: this.single ? this.originalname : image.originalname,
                         category: this.newCategoryList
                     })
                         .then(() => image.category = this.newCategoryList)
