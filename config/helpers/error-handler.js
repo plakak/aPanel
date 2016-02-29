@@ -13,6 +13,12 @@ module.exports = (app) => {
             console.log('FILE SIZE TOO LARGE');
             res.status(500).end('FILE SIZE TOO LARGE');
         }
+
+        /* HANDLE VALIDATION LARGE*/
+        else if (err.name === 'ValidationError'){
+            res.status(400).json(...err.details);
+        }
+
         else {
             next();
         }

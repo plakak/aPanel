@@ -1,4 +1,6 @@
 var mongoose = require('mongoose');
+var Joi = require('joi');
+Joi.objectId = require('joi-objectid')(Joi);
 
 const postSchema = mongoose.Schema({
     title: String,
@@ -18,6 +20,16 @@ const Post = mongoose.model('Posts', postSchema);
 const addPost = req => {
     return new Promise((resolve, reject) => {
 
+        const requestSchema = Joi.object({
+            title: Joi.string().required(),
+            datePublished: Joi.date().required(),
+            dateEdited: Joi.date().required(),
+            content: Joi.string().required(),
+            by: Joi.string().required(),
+            isActive: Joi.boolean().required(),
+            attachedImages: Joi.array().items(Joi.objectId()).required()
+        });
+
         var newPostData = {
             title: req.body.title,
             content: req.body.content,
@@ -28,16 +40,23 @@ const addPost = req => {
             attachedImages: req.body.attachedImages ? req.body.attachedImages: []
         };
 
-        var newPost = new Post(newPostData);
+        requestSchema.validate(newPostData, error => {
 
-        newPost.save(error => {
             if (error) {
-                reject(error)
+                reject(error);
             } else {
-                newPost.populate('attachedImages', err => {
-                    if (!err) {
-                        resolve(newPost);
-                    } else reject(err);
+                var newPost = new Post(newPostData);
+
+                newPost.save(error => {
+                    if (error) {
+                        reject(error)
+                    } else {
+                        newPost.populate('attachedImages', err => {
+                            if (!err) {
+                                resolve(newPost);
+                            } else reject(err);
+                        });
+                    }
                 });
             }
         });
@@ -48,6 +67,13 @@ const addPost = req => {
 const editPost = req => {
     return new Promise((resolve, reject) => {
 
+        const requestSchema = Joi.object({
+            title: Joi.string().required(),
+            dateEdited: Joi.date().required(),
+            content: Joi.string().required(),
+            attachedImages: Joi.array().items(Joi.objectId()).required()
+        });
+
         var editPostData = {
             title: req.body.title,
             content: req.body.content,
@@ -55,11 +81,18 @@ const editPost = req => {
             attachedImages: req.body.attachedImages ? req.body.attachedImages : []
         };
 
-        Post.findOneAndUpdate({_id: req.body.id}, editPostData, {new: true}).populate('attachedImages').exec((err, data) => {
-            if (err) {
-                reject(err)
+
+        requestSchema.validate(editPostData, error => {
+            if (error) {
+                reject(error);
             } else {
-                resolve(data)
+                Post.findOneAndUpdate({_id: req.body.id}, editPostData, {new: true}).populate('attachedImages').exec((err, data) => {
+                    if (err) {
+                        reject(err)
+                    } else {
+                        resolve(data)
+                    }
+                });
             }
         });
     });
@@ -69,11 +102,35 @@ const editPost = req => {
 
 const getPosts = () => {
     return new Promise(function (resolve, reject) {
+
+        const responseSchema = Joi.array().items(Joi.object().keys({
+            _id: Joi.objectId(),
+            __v: Joi.number().strip(),
+            title: Joi.string().required(),
+            datePublished: Joi.date().required(),
+            dateEdited: Joi.date().required(),
+            content: Joi.string().required(),
+            by: Joi.string().required(),
+            isActive: Joi.boolean().required(),
+            attachedImages: Joi.array().items(Joi.object()).required()
+        }));
+
+
+
         Post.find({})
             .populate('attachedImages')
             .exec(function(error, posts) {
                 if (!error) {
-                    resolve(posts);
+                    var payload = JSON.stringify(posts);
+
+                    responseSchema.validate(payload, (err, sanitized) => {
+                       if (!err) {
+                           resolve(sanitized);
+                       } else {
+                           reject(err);
+                       }
+                    });
+
                 } else {
                     reject(error)
                 }
@@ -83,11 +140,22 @@ const getPosts = () => {
 
 const removePost = req => {
     return new Promise(function (resolve, reject) {
-        Post.findOneAndRemove({_id: req.body.id}, err => {
-            if (err) {
-                reject(err);
+
+        const requestSchema = Joi.object({
+            _id: Joi.string().required()
+        });
+
+        requestSchema.validate({_id: req.body.id}, error => {
+            if (error) {
+                reject(error);
             } else {
-                resolve();
+                Post.findOneAndRemove({_id: req.body.id}, err => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve();
+                    }
+                });
             }
         });
     });
@@ -96,11 +164,22 @@ const removePost = req => {
 const chengeStatus = req => {
     return new Promise(function (resolve, reject) {
 
-        Post.findOneAndUpdate({_id: req.body.id }, {isActive: req.body.isActive}, err => {
-            if (err) {
-                reject(err);
+        const requestSchema = Joi.object({
+            _id: Joi.string().required(),
+            isActive: Joi.boolean().required()
+        });
+
+        requestSchema.validate({_id: req.body.id, isActive: req.body.isActive}, error => {
+            if (error) {
+                reject(error);
             } else {
-                resolve();
+                Post.findOneAndUpdate({_id: req.body.id}, {isActive: req.body.isActive}, err => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve();
+                    }
+                });
             }
         });
     });

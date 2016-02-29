@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
-var Settings = require('../models/settings').Settings;
 var fs = require('fs');
+var Joi = require('joi');
+Joi.objectId = require('joi-objectid')(Joi);
 
 
 const mediaSchema = mongoose.Schema({
@@ -16,31 +17,50 @@ const mediaSchema = mongoose.Schema({
 });
 
 
-
 const Media = mongoose.model('Media', mediaSchema);
 
 const saveMediaReference = (file, req) => {
     return new Promise((resolve, reject) => {
+
+        const requestSchema = Joi.object({
+            originalname: Joi.string().required(),
+            destination: Joi.string().required(),
+            filename: Joi.string().required(),
+            path: Joi.string().required(),
+            relativePath: Joi.string().required(),
+            uploaded: Joi.date().required(),
+            uploadedBy: Joi.string().required(),
+            category: Joi.array().items(Joi.string()).required(),
+            isActive: Joi.boolean().required()
+        });
 
         var newMediaEntry = {
             originalname: file.originalname,
             destination: file.destination,
             filename: file.filename,
             path: file.path,
-            relativePath: file.path.match(/[^public][^dist/].+/g),
+            relativePath: file.path.match(/[^public][^dist/].+/g).join(),
             uploaded: Date.now(),
             uploadedBy: req.user.username,
             category: req.body.category ? req.body.category.replace(/\W+/g, " ").split(' ') : [],
             isActive: true
         };
 
-        var newMedia = new Media(newMediaEntry);
+        requestSchema.validate(newMediaEntry, err => {
 
-        newMedia.save((error, data) => {
-            if (error) {
-                reject(error)
+            if (err) {
+                reject(err)
             } else {
-                resolve(data);
+
+                var newMedia = new Media(newMediaEntry);
+
+                newMedia.save((error, data) => {
+                    if (error) {
+                        reject(error)
+                    } else {
+                        resolve(data);
+                    }
+                });
             }
         });
     });
@@ -50,72 +70,55 @@ const saveMediaReference = (file, req) => {
 const editMedia = req => {
     return new Promise((resolve, reject) => {
 
+        const requestSchema = Joi.object({
+            originalname: Joi.string().required(),
+            category: Joi.array().items(Joi.string()).required()
+        });
+
         var updateMedia = {
             originalname: req.body.originalname,
             category: req.body.category
         };
 
 
-        Media.findOneAndUpdate({_id: req.body.id}, updateMedia, {new : true}, (err, model) => {
-            if (!err) {
-                resolve(model);
+        requestSchema.validate(updateMedia, error => {
+            if (error) {
+                reject(error);
             } else {
-                reject(err);
+                Media.findOneAndUpdate({_id: req.body.id}, updateMedia, {new: true}, (err, model) => {
+                    if (!err) {
+                        resolve(model);
+                    } else {
+                        reject(err);
+                    }
+                });
             }
         });
     });
 };
-
-//todo: move categories into settings model
-
-const addCategory = req => {
-    return new Promise(function (resolve, reject) {
-
-        var category = req.body.category;
-
-        Settings.findOneAndUpdate({},{$push: {"categories": category}}, {safe: true, new : true}, (err, model) => {
-
-            if (!err) {
-                resolve(model);
-            } else {
-                reject(err);
-            }
-        });
-    });
-};
-
-const removeCategory = req => {
-    return new Promise(function (resolve, reject) {
-
-        Settings.findOne((err, data) => {
-
-            var index = data.categories.indexOf(req.body.category);
-            var newData = data.categories.slice(0, index).concat(data.categories.slice(index +1));
-
-        data.update(newData)
-            .then(resolve())
-            .catch(reject(err => console.log(err)));
-
-        });
-    });
-};
-
 
 const chengeStatus = req => {
     return new Promise(function (resolve, reject) {
 
-        Media.findOneAndUpdate({_id: req.body.id }, {isActive: req.body.isActive}, err => {
-            if (err) {
-                reject(err);
+        Joi.validate({id: req.body.id, isActive: req.body.isActive},
+            {
+                id: Joi.objectId().required(),
+                isActive: Joi.boolean().required()
+            }, error => {
+
+            if (error) {
+                reject(error);
             } else {
-                resolve();
+                Media.findOneAndUpdate({_id: req.body.id}, {isActive: req.body.isActive}, err => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve();
+                    }
+                });
             }
         });
     });
-};
-
-const changeFileName = req => {
-
 };
 
 const removeMedia = req => {
@@ -133,13 +136,20 @@ const removeMedia = req => {
     };
 
     return new Promise(function (resolve, reject) {
-        Media.findOneAndRemove({_id: req.body.id }, (err, data) => {
-            if (err) {
-                reject(err);
+        Joi.validate( {id: req.body.id}, {id: Joi.objectId().required()}, error => {
+            if (error) {
+                reject(error);
             } else {
-                removeFile(data.path)
-                .then( ()=> resolve() )
-                .catch( err => console.log(err) );
+                Media.findOneAndRemove({_id: req.body.id }, (err, data) => {
+
+                    if (err) {
+                        reject(err);
+                    } else {
+                        removeFile(data.path)
+                            .then( ()=> resolve() )
+                            .catch( err => console.log(err) );
+                    }
+                });
             }
         });
     });
@@ -147,11 +157,35 @@ const removeMedia = req => {
 
 const getMedia = () => {
     return new Promise(function (resolve, reject) {
+
+        const responseSchema =  Joi.array().items(Joi.object({
+            _id: Joi.objectId().required(),
+            originalname: Joi.string().required(),
+            destination: Joi.string().required(),
+            filename: Joi.string().required(),
+            path: Joi.string().required().strip(),
+            relativePath: Joi.string().required(),
+            uploaded: Joi.date().required(),
+            uploadedBy: Joi.string().required(),
+            category: Joi.array().items(Joi.string()).required(),
+            isActive: Joi.boolean().required(),
+            __v: Joi.number().strip()
+        }));
+
+
         Media.find().exec((err, data) => {
             if (err) {
                 reject(err);
             } else {
-                resolve(data);
+                var payload = JSON.stringify(data);
+                responseSchema.validate(payload, (error, response) => {
+                    if (error) {
+                        reject(error);
+                    } else {
+                        resolve(response);
+                    }
+                });
+
             }
         });
     });
@@ -159,11 +193,36 @@ const getMedia = () => {
 
 const getCategory = (category) => {
     return new Promise(function (resolve, reject) {
+
+        const responseSchema =  Joi.array().items(Joi.object({
+            _id: Joi.objectId().required(),
+            originalname: Joi.string().required(),
+            destination: Joi.string().required(),
+            filename: Joi.string().required(),
+            path: Joi.string().required().strip(),
+            relativePath: Joi.string().required(),
+            uploaded: Joi.date().required(),
+            uploadedBy: Joi.string().required(),
+            category: Joi.array().items(Joi.string().valid(category).required()).required(),
+            isActive: Joi.boolean().required(),
+            __v: Joi.number().strip()
+        }));
+
+
         Media.find({category}, (err, data) => {
-            if(!err) {
-                resolve(data)
+            if (err) {
+                reject(err);
+            } else {
+                var payload = JSON.stringify(data);
+                responseSchema.validate(payload, (error, response) => {
+                    if (error) {
+                        reject(error);
+                    } else {
+                        resolve(response);
+                    }
+                });
+
             }
-            else reject(err);
         });
     });
 };
@@ -172,11 +231,8 @@ module.exports = {
     Media,
     editMedia,
     saveMediaReference,
-    addCategory,
-    removeCategory,
     chengeStatus,
     removeMedia,
-    changeFileName,
     getMedia,
     getCategory
 };

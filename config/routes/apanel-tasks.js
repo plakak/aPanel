@@ -1,5 +1,5 @@
 var express = require('express');
-var Settings = require('../models/settings').Settings;
+var Settings = require('../models/settings');
 var Page = require('../models/pages');
 var Media = require('../models/media');
 var Post = require('../models/posts');
@@ -20,29 +20,25 @@ router.all('*', checkAuth);
  ########## */
 
 
-router.get('/siteStatus', (req, res) => {
-    Settings.findOne().lean().exec((err, data) => {
-            if (!err) {
-            res.json(data);
-
-        } else {
-            res.end(err);
-        }
-    });
+router.get('/siteStatus', (req, res, next) => {
+    Settings.getSiteStatus()
+        .then(data => res.json(data))
+        .catch(err => next(err))
 });
 
-router.post('/siteStatus', (req, res) => {
-    Settings.findOneAndUpdate({siteActive: !req.body.siteActive}, {siteActive: req.body.siteActive}, (err, suc) => {
-        res.json(suc);
-    });
+router.post('/siteStatus', (req, res, next) => {
+    Settings.changeSiteStatus(req)
+        .then(data => res.json(data))
+        .catch(error => next(error));
 });
+
 
 /* ##########
  PAGES / POSTS / MEDIA
  ROUTES
  ########## */
 
-router.post('/:type/:action', upload.array('media'), (req, res) => {
+router.post('/:type/:action', upload.array('media'), (req, res, next) => {
 
 
     if (req.params.type  === 'pages' || req.params.type  ===  'posts') {
@@ -50,16 +46,24 @@ router.post('/:type/:action', upload.array('media'), (req, res) => {
 
         switch (req.params.action) {
             case 'add':
-                type.add(req).then(response => res.json(response));
+                type.add(req)
+                    .then(response => res.json(response))
+                    .catch(error => next(error));
                 break;
             case 'edit':
-                type.edit(req).then(response => res.json(response));
+                type.edit(req)
+                    .then(response => res.json(response))
+                    .catch(error => next(error));
                 break;
             case 'remove':
-                type.remove(req).then(response => res.json(response));
+                type.remove(req)
+                    .then(response => res.json(response))
+                    .catch(error => next(error));
                 break;
             case 'changeStatus':
-                type.chengeStatus(req).then(response =>res.json(response));
+                type.chengeStatus(req)
+                    .then(response =>res.json(response))
+                    .catch(error => next(error));
                 break;
             default:
                 res.end('Wrong query');
@@ -74,28 +78,29 @@ router.post('/:type/:action', upload.array('media'), (req, res) => {
                     promises.push(Media.saveMediaReference(file, req));
                 });
 
-                Promise.all(promises).then(response => res.json(response));
-
+                Promise.all(promises)
+                    .then(response => res.json(response))
+                    .catch(error => next(error));
                 break;
             case 'edit':
                 Media.editMedia(req)
                     .then(response => res.json(response))
-                    .catch(err => res.json(err));
+                    .catch(error => next(error));
                 break;
             case 'remove':
                 Media.removeMedia(req)
                     .then(response => res.json(response))
-                    .catch(err => res.json(err));
+                    .catch(error => next(error));
                 break;
             case 'addCategory':
-                Media.addCategory(req)
+                Settings.addCategory(req)
                     .then(resposne => res.json(resposne))
-                    .catch(err => res.json(err));
+                    .catch(error => next(error));
                 break;
             case 'removeCategory':
-                Media.removeCategory(req)
+                Settings.removeCategory(req)
                     .then(resposne => res.json(resposne))
-                    .catch(err => res.json(err));
+                    .catch(error => next(error));
                 break;
             default:
                 res.end('Wrong query');
