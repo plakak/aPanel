@@ -96,7 +96,7 @@
 
 <template>
     <p class="upload-title">FILE UPLOAD</p>
-    <form enctype="multipart/form-data" method="POST">
+    <form enctype="multipart/form-data" method="POST"  v-on:submit.prevent>
 
         <label class="filename" :style="sendIndicator" v-dropbox="files">
             {{ fileName }}
