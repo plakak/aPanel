@@ -273,8 +273,7 @@
                     this.mediaData.forEach(image => {
                         if (image.category) {
                             if (image.category.indexOf(category) !== -1) {
-                                let index = image.category.indexOf(category);
-                                let tmpItems = [...image.category.slice(0, index), ...image.category.slice(index + 1)];
+                                let tmpItems = image.category.filter(item => item !== category);
                                 promises.push(
                                         axios.post('/aPanel/tasks/media/edit', {
                                             id: image._id,
@@ -380,8 +379,7 @@
                             if (e._id === item._id) {
                                 let warning = confirm(`This image is used in a ${next.title} post. Are you sure you want to delete it?`);
                                 if (warning) {
-                                    let index = next.attachedImages.indexOf(e);
-                                    let tmpItems = [...next.attachedImages.slice(0, index), ...next.attachedImages.slice(index + 1)];
+                                    let tmpItems = next.attachedImages.filter(item => item !== e);
 
                                     promises.push(
                                             axios.post('/aPanel/tasks/posts/edit', {

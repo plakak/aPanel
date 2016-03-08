@@ -269,11 +269,7 @@
                 }
             },
             removeFromList(){
-                let index = this.newCategoryList.indexOf(this.selectedCategory);
-                this.newCategoryList = [
-                    ...this.newCategoryList.slice(0, index),
-                    ...this.newCategoryList.slice(index + 1)
-                ];
+                this.newCategoryList = this.newCategoryList.filter(item => item !== this.selectedCategory);
             },
             batchUpdate(){
                 let promises = [];
