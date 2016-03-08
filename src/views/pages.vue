@@ -220,24 +220,24 @@
                     let selected = this.pageData.filter(e => e.isSelected);
 
                     if (selected.length > 1) {
-                        this.$set('modal.items', `${selected.length} items?`);
-                        this.$set('modal.modalIsOpen', !this.modal.modalIsOpen);
-                        this.$set('modal.toRemove', selected);
+                        this.modal.items = `${selected.length} items?`;
+                        this.modal.modalIsOpen = !this.modal.modalIsOpen;
+                        this.modal.toRemove = selected;
 
                     } else {
-                        this.$set('modal.items', `${page.title}?`);
-                        this.$set('modal.modalIsOpen', !this.modal.modalIsOpen);
-                        this.$set('modal.toRemove', [page]);
+                        this.modal.items = `${page.title}?`;
+                        this.modal.modalIsOpen = !this.modal.modalIsOpen;
+                        this.modal.toRemove = [page];
                     }
                 }
             },
             removePageConfirmation(bool){
                 if (!bool){
-                    this.$set('modal.modalIsOpen', !this.modal.modalIsOpen);
-                    this.$set('modal.toRemove', []);
+                    this.modal.modalIsOpen = !this.modal.modalIsOpen;
+                    this.modal.toRemove = [];
                 } else {
                     this.modal.toRemove.forEach(item => this._deletePage(item));
-                    this.$set('modal.modalIsOpen', !this.modal.modalIsOpen);
+                    this.modal.modalIsOpen = !this.modal.modalIsOpen;
                 }
             },
 

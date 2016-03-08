@@ -168,7 +168,7 @@
         methods: {
             _onFileChange(e) {
                 let files = e.target.files || e.dataTransfer.files;
-                this.$set('files', files);
+                this.files = files;
             },
 
             fileSubmit(){
@@ -177,22 +177,22 @@
                 }
             },
             clearSelected(){
-                this.$set('files', '');
+                this.files = '';
             }
         },
         events: {
             'fileSent'(status){
                if (status) {
-                   this.$set('files', '');
-                   this.$set('success', true);
+                   this.files = '';
+                   this.success = true;
                } else {
-                   this.$set('files', '');
-                   this.$set('failure', true);
+                   this.files = '';
+                   this.failure = true;
                }
 
                 setTimeout(() => {
-                    this.$set('success', false);
-                    this.$set('failure', false);
+                    this.success = false;
+                    this.failure = false;
                 }, 2250)
 
             }

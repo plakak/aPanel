@@ -259,8 +259,8 @@
             addCategory(name) {
                 axios.post('/aPanel/tasks/media/addCategory', {category: name})
                     .then(response => {
-                        this.$set('modalAddCategory', false);
-                        this.$set('categories', response.data.categories);
+                        this.modalAddCategory =false;
+                        this.categories = response.data.categories;
                     })
                     .catch(err => console.log(err));
 
@@ -305,7 +305,7 @@
 
             toggleDetails(){
                 if (this.selected.length > 0){
-                    this.$set('showDetails', !this.showDetails);
+                    this.showDetails = !this.showDetails;
                 }
             },
 
@@ -348,25 +348,25 @@
 
             deleteHandeler(){
                 if (this.selected.length > 1) {
-                    this.$set('deleteModal.items', `${this.selected.length} items?`);
-                    this.$set('deleteModal.modalIsOpen', !this.deleteModal.modalIsOpen);
-                    this.$set('deleteModal.toRemove', this.selected);
+                    this.deleteModal.items = `${this.selected.length} items?`;
+                    this.deleteModal.modalIsOpen =!this.deleteModal.modalIsOpen;
+                    this.deleteModal.toRemove = this.selected;
 
                 } else if (this.selected.length === 1) {
-                    this.$set('deleteModal.items', `${this.selected[0].originalname}?`);
-                    this.$set('deleteModal.modalIsOpen', !this.deleteModal.modalIsOpen);
-                    this.$set('deleteModal.toRemove', this.selected);
+                    this.deleteModal.items = `${this.selected[0].originalname}?`;
+                    this.deleteModal.modalIsOpen = !this.deleteModal.modalIsOpen;
+                    this.deleteModal.toRemove = this.selected;
                 }
 
             },
             removePageConfirmation(bool){
                 if (!bool) {
-                    this.$set('deleteModal.modalIsOpen', !this.deleteModal.modalIsOpen);
-                    this.$set('deleteModal.toRemove', []);
+                    this.deleteModal.modalIsOpen =!this.deleteModal.modalIsOpen;
+                    this.deleteModal.toRemove = [];
                 } else {
                     this.deleteModal.toRemove.forEach(item => this._deleteItem(item));
-                    this.$set('deleteModal.toRemove', []);
-                    this.$set('deleteModal.modalIsOpen', !this.deleteModal.modalIsOpen);
+                    this.deleteModal.toRemove = [];
+                    this.deleteModal.modalIsOpen =!this.deleteModal.modalIsOpen;
                 }
             },
 

@@ -281,8 +281,8 @@
             mediaFiles
         },
         compiled(){
-            this.$set('title', this.externalData.title);
-            this.$set('content', this.externalData.content);
+            this.title = this.externalData.title;
+            this.content = this.externalData.content;
         },
         ready(){
             this.mainCheck();
@@ -356,8 +356,8 @@
                 }
             },
             undoEdits(){
-                this.$set('title', this.externalData.title);
-                this.$set('content', this.externalData.content);
+                this.title = this.externalData.title;
+                this.content = this.externalData.content;
             },
             saveEdits() {
                 if (this.photo) {
@@ -372,29 +372,28 @@
         events: {
             'saved'(){
                 this.mainCheck();
-
              }
         },
         watch: {
             'title'() {
                 if (this.content !== this.externalData.content || this.title !== this.externalData.title || !this.imagesChanged) {
-                    this.$set('externalData.isEdited', true);
+                    this.externalData.isEdited = true;
                 } else {
-                    this.$set('externalData.isEdited', false);
+                    this.externalData.isEdited = false;
                 }
             },
             'content'() {
                 if (this.content !== this.externalData.content || this.title !== this.externalData.title || !this.imagesChanged) {
-                    this.$set('externalData.isEdited', true);
+                    this.externalData.isEdited = true;
                 } else {
-                    this.$set('externalData.isEdited', false);
+                    this.externalData.isEdited = false;
                 }
             },
             'imagesChanged'(result){
                 if (this.content !== this.externalData.content || this.title !== this.externalData.title || !result){
-                    this.$set('externalData.isEdited', true);
+                    this.externalData.isEdited = true;
                 } else {
-                    this.$set('externalData.isEdited', false);
+                    this.externalData.isEdited = false;
                 }
             }
         }

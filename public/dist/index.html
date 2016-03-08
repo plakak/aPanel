@@ -1,26 +1,58 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="TestApp">
 <head>
 	<link href='https://fonts.googleapis.com/css?family=Lato:300' rel='stylesheet' type='text/css'>
 	<style>
+		img {
+			display: block;
+			max-width: 100%;
+		}
 	body {
 		font-family: 'Lato', sans-serif;
 		min-width: 500px;
 		min-height: 500px;
 		font-size: 16px;
-		display: flex;
 	}
 	h1 {
 		margin: auto;
 		font-size: 3em;
 		font-weight: 300;
 	}
+	[ng-cloak] {
+		display: none;
+	}
+		.images {
+			display: flex;
+			flex-direction: column;
+			width: 50%;
+			margin: 20px auto;
+			background-color: #00b3ee;
+			cursor: pointer;
+		}
+
+		.active {
+			background-color: yellow;
+		}
+
+
 	</style>
 	<title></title>
 </head>
-<body>
+<body ng-controller="MainCtrl" ng-cloak>
 
-	<h1>&#60;website&#62;</h1>
+{{ here }}
 
+<!--<div class="images">-->
+<!--<div ng-repeat="item in test" item-directive>-->
+	<!--<img ng-src="{{item.relativePath}}" />-->
+	<!--<p>{{ item.originalname }}</p>-->
+<!--</div>-->
+<!--</div>-->
+
+<test here="{{ here }}"></test>
+
+
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
+	<script src="js/app.js"></script>
 </body>
 </html>

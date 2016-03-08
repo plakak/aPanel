@@ -116,25 +116,24 @@
         beforeCompile() {
             axios.get('/aPanel/tasks/siteStatus/')
                     .then(response => {
-                        this.$set('siteActive',response.data.siteActive);
-                        this.$set('offlineDescription', response.offlineDescription || "We'll be back soon!");
-                        this.$set('siteName', response.siteName);
+                        this.siteActive = response.data.siteActive;
+                        this.offlineDescription = response.offlineDescription || "We'll be back soon!";
+                        this.siteName = response.siteName;
                     });
         },
         methods: {
             hideWarning() {
-                this.$set('dismissed', true);
-                console.log(this.dismissed);
+                this.dismissed = true;
             },
             activateSite(){
                 axios.post('/aPanel/tasks/siteStatus/', {siteActive: !this.siteActive})
-                    .then(response =>  this.$set('siteActive', !this.siteActive))
+                    .then(response =>  this.siteActive = !this.siteActive)
                     .catch(err => console.log(err));
             },
             //for testing
             killSite(){
                 axios.post('/aPanel/tasks/siteStatus/', {siteActive: !this.siteActive})
-                        .then(response =>  this.$set('siteActive', !this.siteActive))
+                        .then(response =>  this.siteActive = !this.siteActive)
                         .catch(err => console.log(err));
             }
         },
