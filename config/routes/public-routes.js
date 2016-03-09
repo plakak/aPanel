@@ -12,12 +12,12 @@ router.get('/getData/:type/:category?', (req,res, next) => {
 
         switch(req.params.type) {
             case 'pages':
-                Page.getPages()
+                Page.getPages({isActive: true})
                     .then(data => res.json(data))
                     .catch(error => next(error));
                 break;
             case 'posts':
-                Post.getPosts()
+                Post.getPosts({isActive: true})
                     .then(data => res.json(data))
                     .catch(error => next(error));
                 break;

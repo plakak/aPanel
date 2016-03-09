@@ -100,7 +100,7 @@ const editPost = req => {
 
 
 
-const getPosts = () => {
+const getPosts = confObject => {
     return new Promise(function (resolve, reject) {
 
         const responseSchema = Joi.array().items(Joi.object().keys({
@@ -117,7 +117,7 @@ const getPosts = () => {
 
 
 
-        Post.find({})
+        Post.find(confObject)
             .populate('attachedImages')
             .exec(function(error, posts) {
                 if (!error) {

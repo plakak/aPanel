@@ -46,7 +46,7 @@
 
      .scroll-container {
         padding: 20px;
-        height: 35em;
+        height: 25em;
         overflow-y: scroll;
     }
 

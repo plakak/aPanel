@@ -132,7 +132,7 @@ const removePage = req => {
     });
 };
 
-const getPages = () => {
+const getPages = confObject => {
     return new Promise(function (resolve, reject) {
 
         const responseSchema = Joi.array().items(Joi.object().keys({
@@ -146,7 +146,7 @@ const getPages = () => {
             isActive: Joi.boolean().required()
         }));
 
-        Page.find().exec((err, data) => {
+        Page.find(confObject).exec((err, data) => {
            if (err) {
                reject(err);
            } else {

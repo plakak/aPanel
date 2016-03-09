@@ -100,7 +100,7 @@
     export default {
         route: {
             data(transition) {
-                axios.get('/getData/pages')
+                axios.get('/aPanel/tasks/getData/pages')
                     .then(response => {
                         let pageData = response.data.map(e => {
                             return Object.assign({}, e,

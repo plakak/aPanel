@@ -110,7 +110,7 @@
             data(transition) {
 
                 const promises = [
-                axios.get('/getData/posts')
+                axios.get('/aPanel/tasks/getData/posts')
                     .then(response => {
                         return response.data.map(e => {
                             return Object.assign({}, e,
