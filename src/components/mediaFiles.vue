@@ -2,7 +2,7 @@
 
     img {
         max-width: 100%;
-
+        max-height: 30em;
     }
 
     .image-container{
@@ -30,18 +30,8 @@
         user-select: none;
     }
 
-    .item-inside {
-
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .image {
-        display: flex;
-        align-items: center;
-        align-self: center;
+    .image > img {
+        max-height: 11em;
     }
 
      .scroll-container {
@@ -78,7 +68,6 @@
         line-height: 2em;
         padding: 10px;
         background-color: rgba(0,0,0,.4);
-        overflow-y: hidden;
         transition: opacity .3s linear;
     }
 
@@ -123,11 +112,9 @@
                      v-for="image in externalData | orderBy 'uploaded' -1 | byCategory selectedCategory"
                      @click="selectImage(image)"
                      v-db-click-handler :image="image">
-                    <div class="item-inside">
                         <div class="image">
                             <img :src="image.relativePath" />
                         </div>
-                    </div>
                     <div class="media-info" :class="{'info-open': image.isDetails}" >
                         <div class='file-name'>
                             {{ image.originalname }}
