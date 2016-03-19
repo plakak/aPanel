@@ -1,8 +1,8 @@
 import Vue from 'vue';
-import Rx, {Observable} from 'rxjs';
 
 export default Vue.directive('db-click-handler', {
     params: ['image'],
+    _timeouts: [],
 
     bind() {
 
@@ -10,11 +10,13 @@ export default Vue.directive('db-click-handler', {
             this.el.classList.toggle('selected');
         }
 
-        this.clickSource = Rx.Observable.fromEvent(this.el, 'click').delay(150);
-        this.dbClickSource =  Rx.Observable.fromEvent(this.el, 'dblclick');
+        this.el.addEventListener('click', this.onClick.bind(this));
+        this.el.addEventListener('dblclick', this.doubleClickHandeler.bind(this));
 
-        this.clickSubscribe = this.clickSource.subscribe(this.clickHandeler.bind(this));
-        this.dblClickSubscribe = this.dbClickSource.subscribe(this.doubleClickHandeler.bind(this));
+    },
+
+    onClick() {
+        this._timeouts.push(setTimeout(() => this.clickHandeler(), 150));
     },
 
     clickHandeler(){
@@ -22,17 +24,15 @@ export default Vue.directive('db-click-handler', {
     },
 
     doubleClickHandeler(){
-        this.clickSubscribe.unsubscribe();
+        this._timeouts.forEach( e => clearTimeout(e) );
 
          Array.from(this.el.children)
              .find(element => /media-info.*/g.test(element.className))
              .classList.toggle('info-open');
-
-        this.clickSubscribe = this.clickSource.subscribe(this.clickHandeler.bind(this));
     },
 
     unbind(){
-        this.clickSubscribe.unsubscribe();
-        this.dblClickSubscribe.unsubscribe();
+        this.el.removeEventListener('click', this.clickMe);
+        this.el.removeEventListener('dblclick', this.doubleClickHandeler);
     }
 });
