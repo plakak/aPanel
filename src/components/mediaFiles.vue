@@ -110,7 +110,6 @@
             <div class="image-container">
                 <div class="item"
                      v-for="image in externalData | orderBy 'uploaded' -1 | byCategory selectedCategory"
-                     @click="selectImage(image)"
                      v-db-click-handler :image="image">
                         <div class="image">
                             <img :src="image.relativePath" />
@@ -179,9 +178,6 @@
                 }, []);
 
                 return post.length > 0 ? post : false;
-            },
-            selectImage(image){
-                image.isSelected = !image.isSelected;
             }
         },
         filters: {

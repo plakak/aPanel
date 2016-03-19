@@ -1,6 +1,7 @@
 import Vue from 'vue';
 
 export default Vue.directive('db-click-handler', {
+    "twoWay": true,
     params: ['image'],
     _timeouts: [],
 
@@ -20,6 +21,7 @@ export default Vue.directive('db-click-handler', {
     },
 
     clickHandeler(){
+        this.params.image.isSelected = !this.params.image.isSelected;
         this.el.classList.toggle('selected');
     },
 
