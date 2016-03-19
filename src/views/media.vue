@@ -180,7 +180,6 @@
 
     <!-- ENDMODALS -->
 
-    </div>
 </template>
 
 <script type="text/babel">
@@ -288,7 +287,10 @@
                     });
 
                     promises.push(axios.post('/aPanel/tasks/media/removeCategory', {category: category})
-                            .then(() => this.categories.$remove(category))
+                            .then(() => {
+                                this.categories.$remove(category);
+                                this.selectedCategory = '';
+                            })
                             .catch(err => console.log(err, 'error')));
 
                     Promise.all(promises)
