@@ -93,28 +93,28 @@
 
     import axios from 'axios';
     import { modal } from 'vue-strap';
-    import moment from 'moment'
+    import moment from 'moment';
+    import Rx from 'rx';
 
     import page from '../components/page.vue'
 
     export default {
         route: {
             data(transition) {
-                axios.get('/aPanel/tasks/getData/pages')
-                    .then(response => {
-                        let pageData = response.data.map(e => {
-                            return Object.assign({}, e,
-                                    {
-                                        isDetails: false,
-                                        isSelected: false,
-                                        isSaved: true,
-                                        isEdited: false
-                                    });
-                        });
-                        transition.next({
-                            pageData
-                        });
-                    });
+                Rx.Observable.fromPromise(axios.get('/aPanel/tasks/getData/pages'))
+                    .map(response => response.data)
+                    .flatMapLatest(Rx.Observable.fromArray)
+                    .map(item => Object.assign({}, item,  {
+                            isDetails: false,
+                            isSelected: false,
+                            isSaved: true,
+                            isEdited: false
+                    }))
+                    .reduce((acc,next) => {
+                        acc.push(next);
+                        return acc;
+                    },[])
+                    .subscribe(pageData => transition.next({pageData}));
             },
             waitForData: true
         },

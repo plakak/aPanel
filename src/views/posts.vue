@@ -100,45 +100,37 @@
 
     import axios from 'axios';
     import { modal } from 'vue-strap';
-    import moment from 'moment'
+    import moment from 'moment';
+    import Rx from 'rx';
 
-    import page from '../components/page.vue'
+    import page from '../components/page.vue';
 
 
     export default {
         route: {
             data(transition) {
-
-                const promises = [
-                axios.get('/aPanel/tasks/getData/posts')
-                    .then(response => {
-                        return response.data.map(e => {
-                            return Object.assign({}, e,
-                                {
-                                    isDetails: false,
-                                    isSelected: false,
-                                    isSaved: true,
-                                    isEdited: false
-                                });
+                const addValues = item => {
+                    return Object.assign({}, item,
+                        {
+                            isDetails: false,
+                            isSelected: false,
+                            isSaved: true,
+                            isEdited: false
                         })
-                    }),
-                axios.get('/getData/media')
-                        .then(response => {
-                            return response.data.map(e => {
-                            return Object.assign({}, e,
-                                {
-                                    isDetails: false,
-                                    isSelected: false,
-                                    isSaved: true,
-                                    isEdited: false
-                                });
-                            })
-                        })];
-                Promise.all(promises).then(response => {
+                };
+
+                Rx.Observable.fromPromise(axios.get('/aPanel/tasks/getData/posts'))
+                    .zip(Rx.Observable.fromPromise(axios.get('/getData/media')), (posts, media) => {
+                        return {
+                            pageData: posts.data.map(post => addValues(post)),
+                            mediaData: media.data.map(media => addValues(media))
+                        }
+                    }).subscribe(data => {
+                        const {pageData, mediaData} = data;
 
                         transition.next({
-                            pageData: response[0],
-                            mediaData: response[1]
+                            pageData,
+                            mediaData
                         });
                     });
             },

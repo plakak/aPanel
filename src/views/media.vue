@@ -187,6 +187,7 @@
     import axios from 'axios';
     import { modal } from 'vue-strap';
     import moment from 'moment';
+    import Rx from 'rx';
 
     import mediaFiles from '../components/mediaFiles.vue';
     import uploadFile from '../components/uploadFile.vue';
@@ -195,35 +196,39 @@
     export default {
         route: {
             data(transition) {
-                const promises = [
-                    axios.get('/getData/media')
-                        .then(response => {
-                            return response.data.map(e => {
-                                return Object.assign({}, e,
-                                    {
-                                        isDetails: false,
-                                        isSelected: false,
-                                        isEdited: false
-                                    });
-                            });
-                        }),
-                    axios.get('/aPanel/tasks/siteStatus')
-                        .then(response => {
-                            return response.data.categories
-                        }),
-                    axios.get('/getData/posts')
-                            .then(response => {
-                                return response.data
-                            })
-                ];
+                const media$ = Rx.Observable.fromPromise(axios.get('/getData/media'))
+                    .map(response => response.data)
+                    .flatMapLatest(Rx.Observable.fromArray)
+                    .map(item => Object.assign({}, item, {
+                                isDetails: false,
+                                isSelected: false,
+                                isEdited: false
+                            }))
+                    .reduce((acc,next) => [...acc, next], []);
 
-                Promise.all(promises).then(response => {
-                    transition.next({
-                        mediaData: response[0],
-                        categories: response[1],
-                        postData: response[2]
-                    });
+                const status$ = Rx.Observable.fromPromise(axios.get('/aPanel/tasks/siteStatus'))
+                    .map(response => response.data.categories);
+
+                const posts$ = Rx.Observable.fromPromise(axios.get('/getData/posts'))
+                    .map(response => response.data);
+
+                const result$ = media$.zip([status$, posts$], (media, status, posts) => {
+                    return {
+                        mediaData: media,
+                        categories: status,
+                        postData: posts
+                    }
                 });
+
+                result$.subscribe(data => {
+                    const {mediaData, categories, postData} = data;
+
+                    transition.next({
+                        mediaData,
+                        categories,
+                        postData
+                    });
+                })
             },
             waitForData: true
         },
