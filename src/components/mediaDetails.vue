@@ -213,7 +213,7 @@
               editTitle: false
           }
         },
-        ready() {
+        mounted() {
             this.$set('originalname', this.selectedItems[0].originalname);
             this.$set('newCategoryList', this.currentCategories);
         },

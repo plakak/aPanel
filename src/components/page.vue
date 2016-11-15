@@ -280,12 +280,10 @@
         components: {
             mediaFiles
         },
-        compiled(){
+        mounted(){
             this.title = this.externalData.title;
             this.content = this.externalData.content;
-        },
-        ready(){
-            this.mainCheck();
+            this.$nextTick(this.mainCheck)
         },
         computed: {
 

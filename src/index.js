@@ -8,46 +8,42 @@ import Pages from './views/pages.vue';
 import Posts from './views/posts.vue';
 import Media from './views/media.vue';
 
-import dropbox from './directives/file-dropbox';
-import dbClickHandler from './directives/click-handler';
-
+const eventBus = new Vue();
+Vue.prototype.$eventBus = eventBus;
 
 Vue.use(VueResource);
 Vue.use(VueRouter);
-
-export var router = new VueRouter();
 
 
 axios.get('/aPanel/tasks/siteStatus')
     .then(resp => {
 
-        Vue.config.debug = true;
-
-        router.map({
-            '/pages': {
-                component: Pages
-            },
-            '/posts': {
-                component: Posts
-            },
-            '/media': {
-                component: Media
-            }
+        const router = new VueRouter({
+            routes: [
+                { path: '/', component: App,
+                children: [
+                    { path: 'pages', component: Pages },
+                    { path: 'posts', component: Posts },
+                    { path: 'media', component: Media },
+                ]},
+                { path: '*', redirect: `/${resp.data.initView}`}
+            ]
         });
 
-        router.redirect({
-            '*': `/${resp.data.initView}`
-        });
-
-        router.beforeEach(function (transition) {
+        router.beforeEach(function (route, redirect, next) {
             axios.get('/aPanel/sessionCheck').then(response => {
                 if (!response.data.auth) {
                     window.location.href = '/aPanel/expired';
-                } else transition.next()
+                } else next()
             });
         });
 
-        router.start(App, '#app');
+
+        new Vue({
+            el: '#app',
+            router: router,
+            render: h => h('router-view')
+        })
 
     })
     .catch(err => console.log(err));

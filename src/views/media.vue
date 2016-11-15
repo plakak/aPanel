@@ -101,85 +101,86 @@
 </style>
 
 <template>
-    <media-details
-        v-if="showDetails"
-        :selected-items="selected"
-        :show-details.sync="showDetails"
-        :add-category="addCategory"
-        :categories="categories"
+    <div>
+        <media-details
+            v-if="showDetails"
+            :selected-items="selected"
+            :show-details.sync="showDetails"
+            :add-category="addCategory"
+            :categories="categories"
 
-    ></media-details>
-    <div class="panel panel-default box-shadow">
-        <div class="panel-body color-bar-media">
-            <div class="categories">
-                <ul>
-                    <div class="cat-list">
-                    <li @click="selectedCategory = ''" :class="{'active': !selectedCategory}">All</li>
-                    <li v-for="category in categories" track-by="$index" :class="{'active': category === selectedCategory}">
-                        <span @click="selectedCategory = category">{{ category }}</span>
-                    </li>
-                    </div>
-                    <div class="categories-controls">
-                    <i class="glyphicon glyphicon-plus button" @click="modalAddCategory = !modalAddCategory"></i>
-                        <i class="glyphicon glyphicon-trash button" @click="deleteCategory"></i>
-                    </div>
-                </ul>
+        ></media-details>
+        <div class="panel panel-default box-shadow">
+            <div class="panel-body color-bar-media">
+                <div class="categories">
+                    <ul>
+                        <div class="cat-list">
+                        <li @click="selectedCategory = ''" :class="{'active': !selectedCategory}">All</li>
+                        <li v-for="(category, index) in categories" track-by="index" :class="{'active': category === selectedCategory}">
+                            <span @click="selectedCategory = category">{{ category }}</span>
+                        </li>
+                        </div>
+                        <div class="categories-controls">
+                        <i class="glyphicon glyphicon-plus button" @click="modalAddCategory = !modalAddCategory"></i>
+                            <i class="glyphicon glyphicon-trash button" @click="deleteCategory"></i>
+                        </div>
+                    </ul>
+                </div>
+                    <media-files
+                        :external-data="mediaData"
+                        :selected-category="selectedCategory"
+                        :post-data="postData"
+                    ></media-files>
+
+                <div class="main-controls" style="font-size: 1.5em">
+                    <i class="glyphicon glyphicon-duplicate button" @click="selectAll" title="Select all"></i>
+                    <i class="glyphicon glyphicon-option-horizontal button" @click="toggleDetails" title="Show details"></i>
+                    <i class="glyphicon glyphicon-trash button" @click="deleteHandeler" title="Delete selected"></i>
+                </div>
+
+
+                <div class="space"></div>
+                    <upload-file
+                            :submit-handeler="submitHandeler"
+                            :categories="categories"
+                    >
+                    </upload-file>
+
+
+                </div>
             </div>
-                <media-files
-                    :external-data="mediaData"
-                    :selected-category="selectedCategory"
-                    :post-data="postData"
-                ></media-files>
-
-            <div class="main-controls" style="font-size: 1.5em">
-                <i class="glyphicon glyphicon-duplicate button" @click="selectAll" title="Select all"></i>
-                <i class="glyphicon glyphicon-option-horizontal button" @click="toggleDetails" title="Show details"></i>
-                <i class="glyphicon glyphicon-trash button" @click="deleteHandeler" title="Delete selected"></i>
-            </div>
 
 
-            <div class="space"></div>
-                <upload-file
-                        :submit-handeler="submitHandeler"
-                        :categories="categories"
-                >
-                </upload-file>
+        <!-- MODALS -->
 
 
-            </div>
-        </div>
-
-
-    <!-- MODALS -->
-
-
-        <modal :show.sync="deleteModal.modalIsOpen" effect="fade" :width="400">
+            <modal :show.sync="deleteModal.modalIsOpen" effect="fade" :width="400">
+                <div slot="modal-header">
+                    <h4 class="modal-title">
+                        <strong>Delete confirmation</strong>
+                    </h4>
+                </div>
+                <div class="modal-body" slot="modal-body">Are you sure you want to delete {{ deleteModal.items }}</div>
+                <div class="modal-footer" slot="modal-footer">
+                    <button type="button" class="btn btn-default" @click="removePageConfirmation(false)">Back</button>
+                    <button type="button" class="btn btn-danger" @click="removePageConfirmation(true)">Delete</button>
+                </div>
+            </modal>
+        <modal :show.sync="modalAddCategory" effect="fade" :width="400">
             <div slot="modal-header">
                 <h4 class="modal-title">
-                    <strong>Delete confirmation</strong>
+                    <strong>Add new category</strong>
                 </h4>
             </div>
-            <div class="modal-body" slot="modal-body">Are you sure you want to delete {{ deleteModal.items }}</div>
+            <div class="modal-body" slot="modal-body"><input v-model="newCategory"></div>
             <div class="modal-footer" slot="modal-footer">
-                <button type="button" class="btn btn-default" @click="removePageConfirmation(false)">Back</button>
-                <button type="button" class="btn btn-danger" @click="removePageConfirmation(true)">Delete</button>
+                <button type="button" class="btn btn-default" @click="modalAddCategory = !modalAddCategory">Back</button>
+                <button type="button" class="btn btn-success" @click="addCategory(newCategory)">Add</button>
             </div>
         </modal>
-    <modal :show.sync="modalAddCategory" effect="fade" :width="400">
-        <div slot="modal-header">
-            <h4 class="modal-title">
-                <strong>Add new category</strong>
-            </h4>
-        </div>
-        <div class="modal-body" slot="modal-body"><input v-model="newCategory"></div>
-        <div class="modal-footer" slot="modal-footer">
-            <button type="button" class="btn btn-default" @click="modalAddCategory = !modalAddCategory">Back</button>
-            <button type="button" class="btn btn-success" @click="addCategory(newCategory)">Add</button>
-        </div>
-    </modal>
 
-    <!-- ENDMODALS -->
-
+        <!-- ENDMODALS -->
+    </div>
 </template>
 
 <script type="text/babel">
@@ -194,44 +195,7 @@
     import mediaDetails from '../components/mediaDetails.vue';
 
     export default {
-        route: {
-            data(transition) {
-                const media$ = Rx.Observable.fromPromise(axios.get('/getData/media'))
-                    .map(response => response.data)
-                    .flatMapLatest(Rx.Observable.fromArray)
-                    .map(item => Object.assign({}, item, {
-                                isDetails: false,
-                                isSelected: false,
-                                isEdited: false
-                            }))
-                    .reduce((acc,next) => [...acc, next], []);
 
-                const status$ = Rx.Observable.fromPromise(axios.get('/aPanel/tasks/siteStatus'))
-                    .map(response => response.data.categories);
-
-                const posts$ = Rx.Observable.fromPromise(axios.get('/getData/posts'))
-                    .map(response => response.data);
-
-                const result$ = media$.zip([status$, posts$], (media, status, posts) => {
-                    return {
-                        mediaData: media,
-                        categories: status,
-                        postData: posts
-                    }
-                });
-
-                result$.subscribe(data => {
-                    const {mediaData, categories, postData} = data;
-
-                    transition.next({
-                        mediaData,
-                        categories,
-                        postData
-                    });
-                })
-            },
-            waitForData: true
-        },
         components: {
             mediaFiles,
             uploadFile,
@@ -254,12 +218,50 @@
                 showDetails: false
             }
         },
+        beforeRouteEnter(to, from, next) {
+            const media$ = Rx.Observable.fromPromise(axios.get('/getData/media'))
+                    .map(response => response.data)
+                    .flatMapLatest(Rx.Observable.fromArray)
+                    .map(item => Object.assign({}, item, {
+                        isDetails: false,
+                        isSelected: false,
+                        isEdited: false
+                    }))
+                    .reduce((acc,next) => [...acc, next], []);
+
+            const status$ = Rx.Observable.fromPromise(axios.get('/aPanel/tasks/siteStatus'))
+                    .map(response => response.data.categories);
+
+            const posts$ = Rx.Observable.fromPromise(axios.get('/getData/posts'))
+                    .map(response => response.data);
+
+            const result$ = media$.zip([status$, posts$], (media, status, posts) => {
+                return {
+                    mediaData: media,
+                    categories: status,
+                    postData: posts
+                }
+            });
+
+            result$.subscribe(data => {
+                const {mediaData, categories, postData} = data;
+
+                next(vm => {
+                    vm.mediaData = mediaData;
+                    vm.categories = categories;
+                    vm.postData = postData;
+                });
+            })
+        },
         computed: {
             selected() {
                 return this.mediaData.filter(e => e.isSelected);
             }
         },
         methods: {
+            fetchData() {
+
+            },
             addCategory(name) {
                 axios.post('/aPanel/tasks/media/addCategory', {category: name})
                     .then(response => {
@@ -293,7 +295,8 @@
 
                     promises.push(axios.post('/aPanel/tasks/media/removeCategory', {category: category})
                             .then(() => {
-                                this.categories.$remove(category);
+                                const index = this.categories.indexOf(category);
+                                this.categories.splice(index, 1)
                                 this.selectedCategory = '';
                             })
                             .catch(err => console.log(err, 'error')));
@@ -316,7 +319,7 @@
             },
 
             submitHandeler(files, category){
-                var formData = new FormData();
+                const formData = new FormData();
 
                 for (let file in files){
                     if (files.hasOwnProperty(file)) {
@@ -347,9 +350,9 @@
                             ...this.mediaData
                         ];
 
-                        this.$broadcast('fileSent', true)
+                        this.$eventBus.$emit('fileSent', true)
                     })
-                    .catch(() => this.$broadcast('fileSent', false));
+                    .catch(() => this.$eventBus.$emit('fileSent', false));
             },
 
             deleteHandeler(){
@@ -396,7 +399,10 @@
                                             }).catch(err => console.log(err, 'error')),
 
                                             axios.post('/aPanel/tasks/media/remove', {id: item._id})
-                                                    .then(() => this.mediaData.$remove(item))
+                                                    .then(() => {
+                                                        let index = this.mediaData.indexOf(item);
+                                                        this.mediaData.splice(index, 1);
+                                                    })
                                                     .catch(err => console.log(err, 'error'))
                                     );
                                 } else {
@@ -416,7 +422,10 @@
                 } else if (promises.length === 0 && cancel === false) {
 
                     axios.post('/aPanel/tasks/media/remove', {id: item._id})
-                        .then(() => this.mediaData.$remove(item))
+                        .then(() => {
+                            let index = this.mediaData.indexOf(item);
+                            this.mediaData.splice(index, 1);
+                        })
                         .catch(err => console.log(err, 'error'))
                 }
             }

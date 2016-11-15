@@ -53,7 +53,7 @@
 
         <div class="panel panel-default box-shadow">
             <div class="panel-body color-bar-pages">
-                <div v-for="page in pageData | orderBy 'datePublished' -1">
+                <div v-for="page in pageDataFiltered">
                     <page class="page_space"
                           :external-data="page"
                           :show-details="showDetails.bind(null, page)"
@@ -95,29 +95,11 @@
     import { modal } from 'vue-strap';
     import moment from 'moment';
     import Rx from 'rx';
+    import orderBy from 'lodash/orderBy'
 
     import page from '../components/page.vue'
 
     export default {
-        route: {
-            data(transition) {
-                Rx.Observable.fromPromise(axios.get('/aPanel/tasks/getData/pages'))
-                    .map(response => response.data)
-                    .flatMapLatest(Rx.Observable.fromArray)
-                    .map(item => Object.assign({}, item,  {
-                            isDetails: false,
-                            isSelected: false,
-                            isSaved: true,
-                            isEdited: false
-                    }))
-                    .reduce((acc,next) => {
-                        acc.push(next);
-                        return acc;
-                    },[])
-                    .subscribe(pageData => transition.next({pageData}));
-            },
-            waitForData: true
-        },
         data() {
             return {
                 modal: {
@@ -131,6 +113,27 @@
         components: {
             page,
             modal
+        },
+        beforeRouteEnter(to, from, next) {
+            Rx.Observable.fromPromise(axios.get('/aPanel/tasks/getData/pages'))
+                    .map(response => response.data)
+                    .flatMapLatest(Rx.Observable.fromArray)
+                    .map(item => Object.assign({}, item,  {
+                        isDetails: false,
+                        isSelected: false,
+                        isSaved: true,
+                        isEdited: false
+                    }))
+                    .reduce((acc,next) => {
+                        acc.push(next);
+                        return acc;
+                    },[])
+                    .subscribe(pageData => next(vm => vm.pageData = pageData));
+        },
+        computed: {
+            pageDataFiltered() {
+                return orderBy(this.pageData, 'datePublised', ['desc']);
+            }
         },
         methods: {
             addNewPage(){
@@ -148,7 +151,6 @@
                     }
                 ]);
             },
-
             saveData(page, data){
                 if (!page.isSaved) {
                     axios.post('/aPanel/tasks/pages/add',
@@ -215,7 +217,8 @@
 
             deleteHandler(page){
                 if(!page.isSaved) {
-                    this.pageData.$remove(page);
+                    const index = this.pageData.indexOf(page);
+                    this.pageData.splice(index, 1)
                 } else {
                     let selected = this.pageData.filter(e => e.isSelected);
 
@@ -243,7 +246,10 @@
 
             _deletePage(page){
                 axios.post('/aPanel/tasks/pages/remove', {id: page._id})
-                        .then(() => this.pageData.$remove(page))
+                        .then(() => {
+                            const index = this.pageData.indexOf(page);
+                            this.pageData.splice(index, 1)
+                        })
                         .catch(err => console.log(err, 'error'));
             }
         }

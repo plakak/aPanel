@@ -38,11 +38,11 @@
         <nav class="navbar navbar-primary">
             <div class="container">
                 <div class="navbar-header">
-                    <a class="navbar-brand" v-link="'/home'">aPanel</a>
+                    <router-link class="navbar-brand" to="/home">aPanel</router-link>
                 </div>
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a  @click='killSite()'>Site Management</a></li>
-                    <li><a v-link="'/users'">Users Management</a></li>
+                    <li><a @click='killSite()'>Site Management</a></li>
+                    <li><router-link to="/users">Users Management</router-link></li>
                     <li><a href="/aPanel/logout">Logout</a></li>
                 </ul>
             </div>
@@ -62,11 +62,11 @@
                     <div class="panel panel-default box-shadow">
                         <div class="panel-body color-bar-nav">
                             <ul class="nav nav-pills nav-stacked">
-                                <li><a v-link="'/pages'"> Pages </a></li>
+                                <li><router-link to="/pages"> Pages</router-link></li>
 
-                                <li><a v-link="'/posts'"> Posts </a></li>
+                                <li><router-link to="/posts"> Posts</router-link></li>
 
-                                <li><a v-link="'/media'">Media</a></li>
+                                <li><router-link to="/media">Media</router-link></li>
                                 </ul>
 
                         </div>
@@ -87,8 +87,8 @@
                 <div class="col-sm-12">
                     <div class="col-sm-12 text-center footer">
                         <ul class="list-inline">
-                            <li><a v-link="'/help'">Help</a></li>
-                            <li><a v-link="'/contact'">Contact</a></li>
+                            <li><router-link to="/help">Help</router-link></li>
+                            <li><router-link to="/contact">Contact</router-link></li>
                         </ul>
                     </div>
                 </div>
@@ -113,7 +113,7 @@
                 loggedIn: isLoggedIn.username
             }
         },
-        beforeCompile() {
+        created() {
             axios.get('/aPanel/tasks/siteStatus/')
                     .then(response => {
                         this.siteActive = response.data.siteActive;

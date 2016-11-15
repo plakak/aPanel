@@ -60,7 +60,7 @@
 
         <div class="panel panel-default box-shadow">
             <div class="panel-body color-bar-posts">
-                <div v-for="page in pageData | orderBy 'datePublished' -1">
+                <div v-for="page in pageDataFiltered">
                     <page class="page_space"
                           :external-data="page"
                           :media-data="mediaData"
@@ -102,43 +102,14 @@
     import { modal } from 'vue-strap';
     import moment from 'moment';
     import Rx from 'rx';
+    import orderBy from 'lodash/orderBy'
 
     import page from '../components/page.vue';
 
 
     export default {
-        route: {
-            data(transition) {
-                const addValues = item => {
-                    return Object.assign({}, item,
-                        {
-                            isDetails: false,
-                            isSelected: false,
-                            isSaved: true,
-                            isEdited: false
-                        })
-                };
-
-                Rx.Observable.fromPromise(axios.get('/aPanel/tasks/getData/posts'))
-                    .zip(Rx.Observable.fromPromise(axios.get('/getData/media')), (posts, media) => {
-                        return {
-                            pageData: posts.data.map(post => addValues(post)),
-                            mediaData: media.data.map(media => addValues(media))
-                        }
-                    }).subscribe(data => {
-                        const {pageData, mediaData} = data;
-
-                        transition.next({
-                            pageData,
-                            mediaData
-                        });
-                    });
-            },
-            waitForData: true
-        },
         data() {
             return {
-
                 modal: {
                     modalIsOpen: false,
                     items: '',
@@ -152,7 +123,37 @@
             page,
             modal
         },
+        beforeRouteEnter(to, from, next) {
+            const addValues = item => {
+                return Object.assign({}, item,
+                        {
+                            isDetails: false,
+                            isSelected: false,
+                            isSaved: true,
+                            isEdited: false
+                        })
+            };
 
+            Rx.Observable.fromPromise(axios.get('/aPanel/tasks/getData/posts'))
+                    .zip(Rx.Observable.fromPromise(axios.get('/getData/media')), (posts, media) => {
+                        return {
+                            pageData: posts.data.map(post => addValues(post)),
+                            mediaData: media.data.map(media => addValues(media))
+                        }
+                    }).subscribe(data => {
+                const {pageData, mediaData} = data;
+
+                next(vm => {
+                    vm.pageData = pageData;
+                    vm.mediaData = mediaData;
+                });
+            });
+        },
+        computed: {
+          pageDataFiltered() {
+              return orderBy(this.pageData, 'datePublised', ['desc']);
+          }
+        },
         methods: {
             addNewPage(){
                 this.$set('pageData', [
@@ -251,7 +252,8 @@
 
             deleteHandler(page){
                 if (!page.isSaved) {
-                    this.pageData.$remove(page);
+                    const index = this.pageData.indexOf(page);
+                    this.pageData.splice(index, 1)
                 } else {
                     let selected = this.pageData.filter(e => e.isSelected);
 
@@ -279,7 +281,10 @@
 
             _deletePage(page){
                 axios.post('/aPanel/tasks/posts/remove', {id: page._id})
-                        .then(() => this.pageData.$remove(page))
+                        .then(() => {
+                            const index = this.pageData.indexOf(page);
+                            this.pageData.splice(index, 1)
+                        })
                         .catch(err => console.log(err, 'error'));
             }
         }

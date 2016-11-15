@@ -109,7 +109,7 @@
         <div class="scroll-container" :class='isWarning'>
             <div class="image-container">
                 <div class="item"
-                     v-for="image in externalData | orderBy 'uploaded' -1 | byCategory selectedCategory"
+                     v-for="image in sortedExternalData"
                      v-db-click-handler :image="image">
                         <div class="image">
                             <img :src="image.relativePath" />
@@ -140,7 +140,7 @@
 
 <script type="text/babel">
 
-    import moment from 'moment'
+    import orderBy from 'lodash/orderBy'
 
     export default {
         props: {
@@ -159,9 +159,17 @@
         },
 
         computed: {
-           isWarning() {
-               return this.warning ? 'warning-color' : 'normal-color'
-           }
+            isWarning() {
+                return this.warning ? 'warning-color' : 'normal-color'
+            },
+            sortedExternalData() {
+                if (this.selectedCategory) {
+                    return orderBy(this.externalData, 'uploaded', ['desc'])
+                            .filter(item => item.category.some(e => e === this.selectedCategory));
+                } else {
+                    return orderBy(this.externalData, 'uploaded', ['desc']);
+                }
+            }
         },
 
         methods: {
@@ -176,15 +184,7 @@
                     }
                     return acc;
                 }, []);
-
                 return post.length > 0 ? post : false;
-            }
-        },
-        filters: {
-            'byCategory'(value, category){
-                if (category) {
-                    return value.filter(item => item.category.some(e => e === category));
-                } else return value;
             }
         }
     }

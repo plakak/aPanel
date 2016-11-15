@@ -7,8 +7,6 @@
         background-color: rgba(220,220,220, 0.2);
     }
 
-
-
     input[type="file"] {
         display: none;
     }
@@ -48,7 +46,7 @@
         }
         &:active {
              background-color: darken(#313a5b, 10%);
-         }
+        }
     }
 
     .filename {
@@ -95,27 +93,28 @@
 </style>
 
 <template>
+    <div> export
     <p class="upload-title">FILE UPLOAD</p>
-    <form enctype="multipart/form-data" method="POST"  v-on:submit.prevent>
+        <form enctype="multipart/form-data" method="POST"  v-on:submit.prevent>
 
-        <label class="filename" :style="sendIndicator" v-dropbox="files">
-            {{ fileName }}
-            <i class="glyphicon glyphicon-remove-circle clear-selected-file" @click="clearSelected" v-show="files"></i>
-        </label>
+            <label class="filename" :style="sendIndicator" v-dropbox="files">
+                {{ fileName }}
+                <i class="glyphicon glyphicon-remove-circle clear-selected-file" @click="clearSelected" v-show="files"></i>
+            </label>
 
-        <div v-if='files' class="category-selector">
-            <span> Category:</span>
-            <input type="text" list="categoryList" v-model="selectedCategory">
-            <datalist id="categoryList">
-                <option v-for="category in categories">{{ category }}</option>
-            </datalist>
-        </div>
+            <div v-if='files' class="category-selector">
+                <span> Category:</span>
+                <input type="text" list="categoryList" v-model="selectedCategory">
+                <datalist id="categoryList">
+                    <option v-for="category in categories">{{ category }}</option>
+                </datalist>
+            </div>
 
-        <label class="media-button--select" for="file" >Select files</label>
-        <input id="file" type="file" name="media" v-on:change="_onFileChange" multiple />
-        <label class="media-button--submit" @click="fileSubmit">Submit</label>
-    </form>
-
+            <label class="media-button--select" for="file" >Select files</label>
+            <input id="file" type="file" name="media" v-on:change="_onFileChange" multiple />
+            <label class="media-button--submit" @click="fileSubmit">Submit</label>
+        </form>
+    </div>
 </template>
 
 <script type="text/babel">
