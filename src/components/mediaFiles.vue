@@ -109,8 +109,11 @@
         <div class="scroll-container" :class='isWarning'>
             <div class="image-container">
                 <div class="item"
-                     v-for="image in sortedExternalData"
-                     v-db-click-handler :image="image">
+                     :class="{'selected': image.isSelected}"
+                     @click="image.isSelected = !image.isSelected"
+                     @mouseover="image.isDetails = true"
+                     @mouseout="image.isDetails = false"
+                     v-for="image in sortedExternalData">
                         <div class="image">
                             <img :src="image.relativePath" />
                         </div>
