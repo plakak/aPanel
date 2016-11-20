@@ -97,7 +97,7 @@
     <p class="upload-title">FILE UPLOAD</p>
         <form enctype="multipart/form-data" method="POST"  v-on:submit.prevent>
 
-            <label class="filename" :style="sendIndicator" v-dropbox="files">
+            <label class="filename" :style="sendIndicator" v-dropbox="files" ref="dropbox">
                 {{ fileName }}
                 <i class="glyphicon glyphicon-remove-circle clear-selected-file" @click="clearSelected" v-show="files"></i>
             </label>
@@ -122,11 +122,11 @@
 
     export default {
         props: {
-            submitHandeler:{
+            submitHandeler: {
                 type: Function,
                 required: true
             },
-            categories:{
+            categories: {
                 type: Array,
                 required: true
             }
@@ -139,6 +139,14 @@
                 failure: false,
                 selectedCategory: ''
             }
+        },
+        mounted() {
+            this.$refs['dropbox'].addEventListener("drop", this.fileDropped);
+            this.$eventBus.$on('fileSent', this._fileSent);
+        },
+        beforeDestroy() {
+            this.$refs['dropbox'].removeEventListener("drop", this.fileDropped);
+            this.$eventBus.$off('fileSent', this._fileSent);
         },
         computed: {
             fileName() {
@@ -155,8 +163,8 @@
                 }
             },
             sendIndicator(){
-                if (this.success){
-                    return {backgroundColor: 'rgba(33, 165, 81, .2)' };
+                if (this.success) {
+                    return {backgroundColor: 'rgba(33, 165, 81, .2)'};
                 } else if (this.failure) {
                     return {backgroundColor: 'rgba(135, 11, 47, .2)'};
                 } else {
@@ -166,34 +174,34 @@
         },
         methods: {
             _onFileChange(e) {
-                let files = e.target.files || e.dataTransfer.files;
-                this.files = files;
+                this.files = e.target.files || e.dataTransfer.files;
             },
-
-            fileSubmit(){
+            fileSubmit() {
                 if (this.files) {
                     this.submitHandeler(this.files, this.selectedCategory)
                 }
             },
-            clearSelected(){
+            clearSelected() {
                 this.files = '';
-            }
-        },
-        events: {
-            'fileSent'(status){
-               if (status) {
-                   this.files = '';
-                   this.success = true;
-               } else {
-                   this.files = '';
-                   this.failure = true;
-               }
+            },
+            fileDropped(e) {
+                e.stopPropagation();
+                e.preventDefault();
+                this.files = e.target.files || e.dataTransfer.files;
+            },
+            _fileSent(status) {
+                if (status) {
+                    this.files = '';
+                    this.success = true;
+                } else {
+                    this.files = '';
+                    this.failure = true;
+                }
 
                 setTimeout(() => {
                     this.success = false;
                     this.failure = false;
-                }, 2250)
-
+                }, 2250);
             }
         }
     }

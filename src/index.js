@@ -8,6 +8,9 @@ import Pages from './views/pages.vue';
 import Posts from './views/posts.vue';
 import Media from './views/media.vue';
 
+import dropbox from './directives/file-dropbox';
+// import dbClickHandler from './directives/click-handler';
+
 const eventBus = new Vue();
 Vue.prototype.$eventBus = eventBus;
 
