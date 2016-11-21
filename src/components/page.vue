@@ -280,10 +280,16 @@
         components: {
             mediaFiles
         },
+        beforeMount() {
+            this.$eventBus.$on('saved', this.mainCheck);
+        },
         mounted(){
             this.title = this.externalData.title;
             this.content = this.externalData.content;
             this.$nextTick(this.mainCheck)
+        },
+        beforeDestory() {
+            this.$eventBus.$off('saved');
         },
         computed: {
 

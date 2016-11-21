@@ -174,7 +174,7 @@
                 </button>
             </div>
 
-            <i class="glyphicon glyphicon-remove button close-details" @click="showDetails = !showDetails"></i>
+            <i class="glyphicon glyphicon-remove button close-details" @click="changeDetailsVisibility()"></i>
         </div>
     </div>
 
@@ -214,8 +214,8 @@
           }
         },
         mounted() {
-            this.$set('originalname', this.selectedItems[0].originalname);
-            this.$set('newCategoryList', this.currentCategories);
+            this.originalname = this.selectedItems[0].originalname;
+            this.newCategoryList = this.currentCategories;
         },
         computed: {
             single() {
@@ -262,6 +262,9 @@
             }
         },
         methods: {
+            changeDetailsVisibility() {
+              this.$eventBus.$emit('showDetails', !this.showDetails);
+            },
             addToList(){
                 if (this.newCategory) {
                     this.$set('newCategoryList', this.newCategoryList.concat(this.newCategory));

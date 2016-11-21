@@ -105,10 +105,9 @@
         <media-details
             v-if="showDetails"
             :selected-items="selected"
-            :show-details.sync="showDetails"
+            :show-details="showDetails"
             :add-category="addCategory"
             :categories="categories"
-
         ></media-details>
         <div class="panel panel-default box-shadow">
             <div class="panel-body color-bar-media">
@@ -116,7 +115,7 @@
                     <ul>
                         <div class="cat-list">
                         <li @click="selectedCategory = ''" :class="{'active': !selectedCategory}">All</li>
-                        <li v-for="(category, index) in categories" track-by="index" :class="{'active': category === selectedCategory}">
+                        <li v-for="(category, index) in categories" v-bind:key="index" :class="{'active': category === selectedCategory}">
                             <span @click="selectedCategory = category">{{ category }}</span>
                         </li>
                         </div>
@@ -187,7 +186,6 @@
 
     import axios from 'axios';
     import { modal } from 'vue-strap';
-    import moment from 'moment';
     import Rx from 'rx';
 
     import mediaFiles from '../components/mediaFiles.vue';
@@ -253,15 +251,18 @@
                 });
             })
         },
+        beforeMount() {
+            this.$eventBus.$on('showDetails', (e) => this.showDetails = e);
+        },
+        beforeDestory() {
+            this.$eventBus.$off('showDetails');
+        },
         computed: {
             selected() {
                 return this.mediaData.filter(e => e.isSelected);
             }
         },
         methods: {
-            fetchData() {
-
-            },
             addCategory(name) {
                 axios.post('/aPanel/tasks/media/addCategory', {category: name})
                     .then(response => {
@@ -296,7 +297,7 @@
                     promises.push(axios.post('/aPanel/tasks/media/removeCategory', {category: category})
                             .then(() => {
                                 const index = this.categories.indexOf(category);
-                                this.categories.splice(index, 1)
+                                this.categories.splice(index, 1);
                                 this.selectedCategory = '';
                             })
                             .catch(err => console.log(err, 'error')));

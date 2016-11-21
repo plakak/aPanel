@@ -32,7 +32,7 @@
         justify-content: flex-end;
 
         .button {
-             padding: 20px;
+            padding: 20px;
         }
     }
 
@@ -126,12 +126,12 @@
         beforeRouteEnter(to, from, next) {
             const addValues = item => {
                 return Object.assign({}, item,
-                        {
-                            isDetails: false,
-                            isSelected: false,
-                            isSaved: true,
-                            isEdited: false
-                        })
+                    {
+                        isDetails: false,
+                        isSelected: false,
+                        isSaved: true,
+                        isEdited: false
+                    })
             };
 
             Rx.Observable.fromPromise(axios.get('/aPanel/tasks/getData/posts'))
@@ -150,9 +150,9 @@
             });
         },
         computed: {
-          pageDataFiltered() {
-              return orderBy(this.pageData, 'datePublised', ['desc']);
-          }
+            pageDataFiltered() {
+                return orderBy(this.pageData, 'datePublised', ['desc']);
+            }
         },
         methods: {
             addNewPage(){
@@ -190,7 +190,7 @@
                                 page.attachedImages = resp.data.attachedImages;
                                 page.title = resp.data.title;
                                 page.content = resp.data.content;
-                                this.$broadcast('saved');
+                                this.$eventBus.$emit('saved');
                             })
 
                             .catch(err => console.log(err, 'error'));
@@ -211,7 +211,7 @@
                                 page.attachedImages = resp.data.attachedImages;
                                 page.content = resp.data.content;
                                 page.dateEdited = moment.now();
-                                this.$broadcast('saved');
+                                this.$eventBus.$emit('saved');
 
                             })
 
@@ -281,11 +281,11 @@
 
             _deletePage(page){
                 axios.post('/aPanel/tasks/posts/remove', {id: page._id})
-                        .then(() => {
-                            const index = this.pageData.indexOf(page);
-                            this.pageData.splice(index, 1)
-                        })
-                        .catch(err => console.log(err, 'error'));
+                    .then(() => {
+                        const index = this.pageData.indexOf(page);
+                        this.pageData.splice(index, 1)
+                    })
+                    .catch(err => console.log(err, 'error'));
             }
         }
     }
