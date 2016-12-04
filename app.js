@@ -1,16 +1,16 @@
 'use strict';
-var express = require('express');
-var app = express();
-var morgan = require('morgan');
-var bodyParser = require('body-parser');
-var cookieParser = require('cookie-parser');
-var mongoose = require('mongoose');
-var flash = require('connect-flash');
+const express = require('express');
+const app = express();
+const morgan = require('morgan');
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const mongoose = require('mongoose');
+const flash = require('connect-flash');
 
-var port = process.env.PORT || 8000;
+const port = process.env.PORT || 8000;
 
-var DB_URI = require('./config/user-settings').dbUri;
-var DB_CRED = require('./config/user-settings').dbCred;
+const DB_URI = require('./config/user-settings').dbUri;
+const DB_CRED = require('./config/user-settings').dbCred;
 
 app.use(morgan('dev'));
 app.use(flash());
@@ -21,12 +21,12 @@ app.use(cookieParser());
 
 mongoose.connect(DB_URI, DB_CRED);
 
-var db = mongoose.connection;
+const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function () {console.log('db connected')});
 
 require('./config/passport-config')(app);
-var pageStatus = require('./config/helpers/page-status');
+const pageStatus = require('./config/helpers/page-status');
 
 app.use('/aPanel', express.static(__dirname + '/public/static/aPanel'));
 app.use('/', pageStatus, express.static(__dirname + '/public/dist'));
