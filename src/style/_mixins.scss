@@ -1,24 +1,24 @@
 @mixin color-bar($color, $content, $textColor: white) {
-  padding-top: 40px;
-  position: relative;
+    padding-top: 40px;
+    position: relative;
 
-  &::before {
-    top: 0;
-    left: 0;
-    right: 0;
-    display: block;
-    margin: -1px;
-    content: $content;
-    padding: 10px 20px 5px;
-    line-height: 20px;
-    color: $textColor;
-    font-size: .95em;
-    font-weight: 400;
-    border-radius: $border-radius-base $border-radius-base 0 0;
-    position: absolute;
-    width: calc(100% + 2px);
-    height: 2.5em;
-    background-color: $color;
-    box-shadow: 0 0 10px rgba(darken($color,5%),.2);
-  }
+    &::before {
+        top: 0;
+        left: 0;
+        right: 0;
+        display: block;
+        margin: -1px;
+        content: $content;
+        padding: 10px 20px 5px;
+        line-height: 20px;
+        color: $textColor;
+        font-size: .95em;
+        font-weight: 400;
+        border-radius: $border-radius-base $border-radius-base 0 0;
+        position: absolute;
+        width: calc(100% + 2px);
+        height: 2.5em;
+        background-color: $color;
+        box-shadow: 0 0 10px rgba(darken($color, 5%), .2);
+    }
 }

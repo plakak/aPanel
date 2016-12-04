@@ -1,130 +1,129 @@
-
 @import 'bootstrap';
 @import 'mixins';
 @import url(https://fonts.googleapis.com/css?family=Lato:300,400,400italic,700);
 
 html, body {
-  box-sizing: border-box;
-  font-size: 16px;
-  font-family: 'Lato', sans-serif;
-  font-weight: 400;
+    box-sizing: border-box;
+    font-size: 16px;
+    font-family: 'Lato', sans-serif;
+    font-weight: 400;
 }
 
-
 .color-bar-info {
-  @include color-bar(#46706b, "Informations");
+    @include color-bar(#46706b, "Informations");
 }
 
 .color-bar-nav {
-  @include color-bar(#5683A3, "Navigation");
+    @include color-bar(#5683A3, "Navigation");
 }
+
 .color-bar-error {
-  @include color-bar(#d5706b, "Warning! Site is inactive!");
+    @include color-bar(#d5706b, "Warning! Site is inactive!");
 }
+
 .color-bar-success {
-  @include color-bar(darken(#71c271, 20%), "");
+    @include color-bar(darken(#71c271, 20%), "");
 }
 
 .color-bar-pages {
-  @include color-bar(darken(#d5703a,20%), "Pages");
+    @include color-bar(darken(#d5703a, 20%), "Pages");
 }
 
 .color-bar-posts {
-  @include color-bar(#9c8e38, "Posts");
+    @include color-bar(#9c8e38, "Posts");
 }
 
 .color-bar-media {
-  @include color-bar(#553a5b, "Media files");
+    @include color-bar(#553a5b, "Media files");
 }
 
 body {
-  background-color: lighten(#EDEFF0, 1%);
+    background-color: lighten(#EDEFF0, 1%);
 }
 
 .annotation {
-  font-size: 0.850em;
+    font-size: 0.850em;
 }
 
 h5 {
-  font-size: 1.5em;
-  font-weight: 700;
+    font-size: 1.5em;
+    font-weight: 700;
 }
 
 .box-shadow {
-  box-shadow: 1px 5px 10px rgba(0,0,0,.2);
+    box-shadow: 1px 5px 10px rgba(0, 0, 0, .2);
 }
 
 [v-cloak] {
-  display: none;
+    display: none;
 }
 
 input {
-  display: block;
-  margin: 0 auto;
+    display: block;
+    margin: 0 auto;
 }
 
 button {
-  margin-top: 20px;
+    margin-top: 20px;
 }
 
 .break {
-  word-break: break-all;
+    word-break: break-all;
 }
 
 .error {
-  color: #e90d00;
-  font-size: 0.9em;
-  margin-bottom: 5px;
+    color: #e90d00;
+    font-size: 0.9em;
+    margin-bottom: 5px;
 }
 
 small {
-  display: block;
+    display: block;
 }
 
-
 .form-inputs {
-  background-color: rgba(220,220,220, 0.2);
-  //background-color: inherit;
-  border-radius: 4px;
-  border: 0;
-  padding-left: 10px;
-  padding-right: 10px;
-  margin-bottom: 20px;
-  &:focus {
-    background-color: white;
-    outline: none;
-  }
-
-  @at-root input {
-    text-align: center;
-    font-size: 1.2em;
-    font-weight: 700;
-    min-height: 50px;
-  }
-
-  @at-root textarea {
-    font-weight: 400;
-    text-align: justify;
-    overflow: hidden;
-    min-height: 300px;
-    max-width: 100%;
-    max-height: 200px;
-
+    background-color: rgba(220, 220, 220, 0.2);
+    //background-color: inherit;
+    border-radius: 4px;
+    border: 0;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-bottom: 20px;
     &:focus {
-      overflow: auto;
+        background-color: white;
+        outline: none;
     }
-  }
+
+    @at-root input {
+        text-align: center;
+        font-size: 1.2em;
+        font-weight: 700;
+        min-height: 50px;
+    }
+
+    @at-root textarea {
+        font-weight: 400;
+        text-align: justify;
+        overflow: hidden;
+        min-height: 300px;
+        max-width: 100%;
+        max-height: 200px;
+
+        &:focus {
+            overflow: auto;
+        }
+    }
 }
 
 .form-inputs--untouched {
-  border-bottom: 4px solid darken(white, 40%);
+    border-bottom: 4px solid darken(white, 40%);
 }
 
 .form-inputs--unsaved {
-   border-bottom: 4px solid #e90d00;
- }
+    border-bottom: 4px solid #e90d00;
+}
 
 .form-inputs--valid {
-  border-bottom: 4px solid #49e670;
+    border-bottom: 4px solid #49e670;
 }
 
